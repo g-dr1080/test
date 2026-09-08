@@ -193,7 +193,7 @@
          <h3 class="font-bold text-lg mt-1">내가 만든 회로도</h3>
          <svg id="circuit-result-svg" viewBox="0 0 800 400" role="img" aria-label="내가 만든 회로도"></svg>
          <p id="circuit-result-judgement" class="font-bold mt-2"></p>
-         <p class="result-note">확인 결과와 상관없이 네가 배치한 부품을 그대로 회로도 기호로 다시 그립니다.</p>
+         <p class="result-note">네가 배치한 부품과 순서는 그대로 유지하고, 보기 쉽게 회로도 형태로 자동 정렬해 그립니다. 틀린 회로도 그대로 표시됩니다.</p>
          <div id="schematic-legend" class="schematic-legend"></div>
         </div>
        </div>
@@ -550,29 +550,94 @@
       const svg=document.getElementById("circuit-result-svg");
       if(!svg) return;
       svg.innerHTML="";
-      const zone=document.getElementById("circuit-dropzone");
-      const zw=zone.clientWidth||800, zh=zone.clientHeight||390;
+
       const items=[...circuitPlaced.entries()].sort((a,b)=>a[1].order-b[1].order);
       if(!items.length) return;
-      const points=items.map(([piece,pos])=>({piece,x:70+(pos.x/zw)*660,y:65+(pos.y/zh)*270,order:pos.order}));
-      // Draw wires between the components in the same placement order, preserving wrong layouts too.
-      for(let i=0;i<points.length-1;i++){
-        const a=points[i], b=points[i+1];
-        const pa={x:a.x+(a.x<b.x?34:-34),y:a.y}, pb={x:b.x+(b.x<a.x?34:-34),y:b.y};
-        svg.appendChild(createSvgEl("path",{d:`M ${pa.x} ${pa.y} L ${pb.x} ${pb.y}`,class:"result-wire-plain"}));
+
+      /*
+       * 회로도는 사용자가 회로판에서 어디에 놓았는지와 관계없이
+       * 깔끔한 회로도 형태로 자동 정렬합니다.
+       * 배치 순서는 유지하되, 실제 그림의 좌표는 정돈된 회로도 좌표를 사용합니다.
+       */
+      const schematicW=800, schematicH=400;
+      const layout=[
+        {x:150,y:90}, {x:400,y:90}, {x:650,y:90}, {x:650,y:200},
+        {x:650,y:310}, {x:400,y:310}, {x:150,y:310}, {x:150,y:200}
+      ];
+
+      const nonWire=items.filter(([piece])=>piece!=="wire");
+      const wireCount=items.filter(([piece])=>piece==="wire").length;
+      const count=nonWire.length;
+
+      // 실제 회로 부품은 최대 8개까지 깔끔한 폐회로 경로에 배치합니다.
+      const points=nonWire.map(([piece],i)=>({piece,x:layout[i % layout.length].x,y:layout[i % layout.length].y,order:i}));
+
+      function connector(pointA, pointB) {
+        const dx=pointB.x-pointA.x;
+        const dy=pointB.y-pointA.y;
+        const horizontal=Math.abs(dx)>=Math.abs(dy);
+        let ax=pointA.x, ay=pointA.y, bx=pointB.x, by=pointB.y;
+        if(horizontal){
+          ax += dx>=0 ? 34 : -34;
+          bx += dx>=0 ? -34 : 34;
+          if(Math.abs(ay-by)<2){
+            return `M ${ax} ${ay} H ${bx}`;
+          }
+          const midX=(ax+bx)/2;
+          return `M ${ax} ${ay} H ${midX} V ${by} H ${bx}`;
+        }
+        ay += dy>=0 ? 34 : -34;
+        by += dy>=0 ? -34 : 34;
+        if(Math.abs(ax-bx)<2){
+          return `M ${ax} ${ay} V ${by}`;
+        }
+        const midY=(ay+by)/2;
+        return `M ${ax} ${ay} V ${midY} H ${bx} V ${by}`;
       }
-      if(points.length>2){
-        const a=points[points.length-1], b=points[0];
-        const pa={x:a.x+(a.x<b.x?34:-34),y:a.y}, pb={x:b.x+(b.x<a.x?34:-34),y:b.y};
-        svg.appendChild(createSvgEl("path",{d:`M ${pa.x} ${pa.y} L ${pb.x} ${pb.y}`,class:"result-wire-plain"}));
+
+      // 부품이 2개 이상이면 배치 순서대로 회로 경로를 만들고 마지막에서 첫 부품으로 돌아옵니다.
+      if(points.length>=2){
+        for(let i=0;i<points.length;i++){
+          const a=points[i], b=points[(i+1)%points.length];
+          svg.appendChild(createSvgEl("path",{
+            d:connector(a,b),
+            class:"result-wire-plain"
+          }));
+        }
+      } else if(points.length===1) {
+        // 부품이 하나뿐이어도 회로도 영역 중앙에서 양 끝 단자를 보여줍니다.
+        svg.appendChild(createSvgEl("line",{
+          x1:points[0].x-90,y1:points[0].y,x2:points[0].x-34,y2:points[0].y,class:"result-wire-plain"
+        }));
+        svg.appendChild(createSvgEl("line",{
+          x1:points[0].x+34,y1:points[0].y,x2:points[0].x+90,y2:points[0].y,class:"result-wire-plain"
+        }));
       }
+
+      // 전선은 회로도에서 별도의 부품 기호 대신 '도선' 자체이므로 연결선으로 표현합니다.
+      if(wireCount>0){
+        const legend=document.getElementById("schematic-legend");
+        if(legend){
+          legend.innerHTML=`<span class="schematic-chip">회로도 기호로 자동 정렬</span><span class="schematic-chip">배치 순서 ${count>0?"유지":"없음"}</span><span class="schematic-chip">전선 ${wireCount}개 반영</span><span class="schematic-chip">틀려도 만든 상태 그대로 표시</span>`;
+        }
+      }
+
       points.forEach(pt=>drawSchematicComponent(svg,pt.piece,pt.x,pt.y));
+
+      // 연결선과 부품이 겹치지 않도록 간단한 안내 제목을 추가합니다.
+      svg.appendChild(createSvgEl("text",{
+        x:400,y:38,fill:"#60dfff","font-size":14,"font-weight":700,"text-anchor":"middle"
+      },"자동 정렬 회로도"));
+
       const verdict=circuitJudgement();
       const result=document.getElementById("circuit-result-judgement");
       result.textContent=verdict.text;
       result.style.color=verdict.ok?"#74f7bf":"#ff9fb0";
+
       const legend=document.getElementById("schematic-legend");
-      if(legend){ legend.innerHTML="<span class='schematic-chip'>회로도 기호로 표시</span><span class='schematic-chip'>배치 순서대로 연결</span><span class='schematic-chip'>틀린 회로도 그대로 표시</span>"; }
+      if(legend){
+        legend.innerHTML=`<span class="schematic-chip">회로도 기호로 자동 정렬</span><span class="schematic-chip">배치 순서 유지</span><span class="schematic-chip">전선 ${wireCount}개 반영</span><span class="schematic-chip">틀려도 만든 상태 그대로 표시</span>`;
+      }
     }
 
     function checkCircuitBuilder() {
