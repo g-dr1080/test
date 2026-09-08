@@ -66,12 +66,12 @@
    <div class="orb orb-b"></div>
    <header class="relative z-10 w-full border-b border-sky-300/15 bg-[#07112b]/85 backdrop-blur-xl">
     <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
-     <button type="button" onclick="showView('home')" class="text-left"> <span data-template-id="site-logo" class="canva-text block font-bold tracking-[.12em]"></span> <span data-template-id="site-tagline" class="canva-text block mt-1 text-sky-200/70"></span> </button>
+     <button type="button" onclick="showView('home')" class="text-left"> <span data-template-id="site-logo" class="canva-text block font-bold tracking-[.12em]">ELECTRO LAB</span> <span data-template-id="site-tagline" class="canva-text block mt-1 text-sky-200/70">전기와 자기 탐구실</span> </button>
      <div class="lab-card rounded-2xl px-4 py-2.5 flex items-center gap-3 min-w-[180px]">
       <div class="w-9 h-9 rounded-xl bg-yellow-300 text-[#07112b] grid place-items-center"><i data-lucide="zap" class="w-5 h-5"></i>
       </div>
       <div>
-       <p data-template-id="progress-label" class="canva-text text-sky-100/65"></p>
+       <p data-template-id="progress-label" class="canva-text text-sky-100/65">학습 진행도</p>
        <p id="hud-exp" class="font-bold text-yellow-100">0 EXP</p>
       </div>
      </div>
@@ -80,74 +80,74 @@
    <main class="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-16">
     <section id="home" class="view active" aria-labelledby="home-title">
      <div data-template-id="home-banner" class="canva-banner lab-card neon-border rounded-[2rem] p-7 sm:p-10 mb-6">
-      <p data-template-id="home-kicker" class="canva-text mini-kicker mb-4"></p>
-      <h1 id="home-title" data-template-id="home-title" class="canva-text page-title font-bold leading-none"></h1>
-      <p data-template-id="home-description" class="canva-text text-sky-100/80 mt-5 max-w-2xl leading-relaxed"></p>
+      <p data-template-id="home-kicker" class="canva-text mini-kicker mb-4">GRADE 8 SCIENCE · UNIT 07</p>
+      <h1 id="home-title" data-template-id="home-title" class="canva-text page-title font-bold leading-none">전기와 자기</h1>
+      <p data-template-id="home-description" class="canva-text text-sky-100/80 mt-5 max-w-2xl leading-relaxed">학습할 주제를 선택하고 실험과 퀴즈를 통해 전기와 자기의 원리를 직접 확인해 보세요.</p>
      </div>
      <div class="grid md:grid-cols-3 gap-5">
       <button type="button" onclick="showView('generation')" data-template-id="generation-topic-card" class="canva-card topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
        <div class="w-14 h-14 rounded-2xl bg-cyan-300/15 text-cyan-200 grid place-items-center"><i data-lucide="zap" class="w-7 h-7"></i>
        </div>
        <div>
-        <p data-template-id="generation-topic-number" class="canva-text mini-kicker"></p>
-        <h2 data-template-id="generation-topic-title" class="canva-text font-bold mt-2"></h2>
-        <p data-template-id="generation-topic-description" class="canva-text text-sky-100/70 mt-3"></p>
-       </div><span data-template-id="generation-topic-action" class="canva-text text-yellow-200 font-bold mt-5"></span> </button> <button type="button" onclick="showView('energy')" data-template-id="energy-topic-card" class="canva-card topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+        <p data-template-id="generation-topic-number" class="canva-text mini-kicker">TOPIC 01</p>
+        <h2 data-template-id="generation-topic-title" class="canva-text font-bold mt-2">전기의 발생</h2>
+        <p data-template-id="generation-topic-description" class="canva-text text-sky-100/70 mt-3">전기가 만들어지는 원리를 알아볼 학습 공간입니다.</p>
+       </div><span data-template-id="generation-topic-action" class="canva-text text-yellow-200 font-bold mt-5">학습 공간 열기 →</span> </button> <button type="button" onclick="showView('energy')" data-template-id="energy-topic-card" class="canva-card topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
        <div class="w-14 h-14 rounded-2xl bg-yellow-300/15 text-yellow-200 grid place-items-center"><i data-lucide="circuit-board" class="w-7 h-7"></i>
        </div>
        <div>
-        <p data-template-id="energy-topic-number" class="canva-text mini-kicker"></p>
-        <h2 data-template-id="energy-topic-title" class="canva-text font-bold mt-2"></h2>
-        <p data-template-id="energy-topic-description" class="canva-text text-sky-100/70 mt-3"></p>
-       </div><span data-template-id="energy-topic-action" class="canva-text text-yellow-200 font-bold mt-5"></span> </button> <button type="button" onclick="showView('magnet')" data-template-id="magnet-topic-card" class="canva-card topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+        <p data-template-id="energy-topic-number" class="canva-text mini-kicker">TOPIC 02</p>
+        <h2 data-template-id="energy-topic-title" class="canva-text font-bold mt-2">전류와 전기 에너지</h2>
+        <p data-template-id="energy-topic-description" class="canva-text text-sky-100/70 mt-3">가상 실험실과 회로 퍼즐로 전류가 흐르는 길을 완성해 보세요.</p>
+       </div><span data-template-id="energy-topic-action" class="canva-text text-yellow-200 font-bold mt-5">실험 시작하기 →</span> </button> <button type="button" onclick="showView('magnet')" data-template-id="magnet-topic-card" class="canva-card topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
        <div class="w-14 h-14 rounded-2xl bg-violet-300/15 text-violet-200 grid place-items-center"><i data-lucide="magnet" class="w-7 h-7"></i>
        </div>
        <div>
-        <p data-template-id="magnet-topic-number" class="canva-text mini-kicker"></p>
-        <h2 data-template-id="magnet-topic-title" class="canva-text font-bold mt-2"></h2>
-        <p data-template-id="magnet-topic-description" class="canva-text text-sky-100/70 mt-3"></p>
-       </div><span data-template-id="magnet-topic-action" class="canva-text text-yellow-200 font-bold mt-5"></span> </button>
+        <p data-template-id="magnet-topic-number" class="canva-text mini-kicker">TOPIC 03</p>
+        <h2 data-template-id="magnet-topic-title" class="canva-text font-bold mt-2">전류의 자기 작용</h2>
+        <p data-template-id="magnet-topic-description" class="canva-text text-sky-100/70 mt-3">자석의 극과 힘을 움직이며 자기장의 성질을 관찰해 보세요.</p>
+       </div><span data-template-id="magnet-topic-action" class="canva-text text-yellow-200 font-bold mt-5">자기장 관찰하기 →</span> </button>
      </div>
     </section>
     <section id="generation" class="view" aria-labelledby="generation-title">
-     <button data-template-id="generation-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="generation-back-label" class="canva-text"></span> </button>
+     <button data-template-id="generation-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="generation-back-label" class="canva-text">← 홈으로 돌아가기</span> </button>
      <div data-template-id="static-lab-panel" class="canva-panel lab-card neon-border rounded-2xl p-6 mt-5">
-      <p data-template-id="static-lab-kicker" class="canva-text mini-kicker"></p>
-      <h1 id="generation-title" data-template-id="generation-title" class="canva-text page-title font-bold mt-2"></h1>
-      <p data-template-id="static-lab-help" class="canva-text text-sky-100/70 mt-2"></p>
+      <p data-template-id="static-lab-kicker" class="canva-text mini-kicker">STATIC ELECTRICITY LAB</p>
+      <h1 id="generation-title" data-template-id="generation-title" class="canva-text page-title font-bold mt-2">전기의 발생</h1>
+      <p data-template-id="static-lab-help" class="canva-text text-sky-100/70 mt-2">빨대와 풍선을 움직여 정전기가 만들어지는 원리를 확인해 보세요.</p>
       <div class="relative mt-6 min-h-[330px] rounded-2xl border border-cyan-300/20 bg-slate-950/35 overflow-hidden" id="static-stage">
        <div id="fur-target" class="absolute left-[8%] bottom-8 w-32 h-24 rounded-xl bg-amber-800/80 border-2 border-amber-300/50 grid place-items-center text-center">
-        <div><i data-lucide="brush" class="text-amber-100"></i><span data-template-id="fur-label" class="canva-text block mt-1"></span>
+        <div><i data-lucide="brush" class="text-amber-100"></i><span data-template-id="fur-label" class="canva-text block mt-1">털가죽</span>
         </div>
-       </div><button id="straw-tool" type="button" onclick="runStaticExperiment()" class="static-part canva-button absolute left-[40%] top-12 rounded-xl border border-cyan-200/30 bg-cyan-300/15 px-5 py-4 text-left"> <i data-lucide="wand-2" class="text-cyan-200"></i><span data-template-id="straw-label" class="canva-text block mt-2"></span> </button>
+       </div><button id="straw-tool" type="button" onclick="runStaticExperiment()" class="static-part canva-button absolute left-[40%] top-12 rounded-xl border border-cyan-200/30 bg-cyan-300/15 px-5 py-4 text-left"> <i data-lucide="wand-2" class="text-cyan-200"></i><span data-template-id="straw-label" class="canva-text block mt-2">빨대</span> </button>
        <div id="balloon-tool" class="absolute right-[9%] bottom-12 rounded-full border border-violet-200/40 bg-violet-400/20 px-5 py-6 text-center">
-        <i data-lucide="circle" class="text-violet-200"></i><span data-template-id="balloon-label" class="canva-text block mt-2"></span>
+        <i data-lucide="circle" class="text-violet-200"></i><span data-template-id="balloon-label" class="canva-text block mt-2">풍선</span>
        </div>
       </div>
       <div class="mt-5 rounded-2xl border border-cyan-300/20 bg-slate-950/30 p-5">
-       <p data-template-id="static-drop-label" class="canva-text text-sky-100/75"></p>
+       <p data-template-id="static-drop-label" class="canva-text text-sky-100/75">빨대를 털가죽에 문지른 뒤 풍선 가까이 가져가 보세요.</p>
        <p id="static-status" class="mt-3 text-yellow-100 font-bold" aria-live="polite"></p>
       </div>
      </div>
     </section>
     <section id="energy" class="view" aria-labelledby="energy-title">
-     <button data-template-id="energy-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="energy-back-label" class="canva-text"></span> </button>
+     <button data-template-id="energy-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="energy-back-label" class="canva-text">← 홈으로 돌아가기</span> </button>
      <div class="mt-6 mb-7">
-      <p data-template-id="energy-kicker" class="canva-text mini-kicker"></p>
-      <h1 id="energy-title" data-template-id="energy-title" class="canva-text page-title font-bold mt-2"></h1>
-      <p data-template-id="energy-description" class="canva-text text-sky-100/70 mt-3"></p>
+      <p data-template-id="energy-kicker" class="canva-text mini-kicker">ELECTRIC CURRENT LAB</p>
+      <h1 id="energy-title" data-template-id="energy-title" class="canva-text page-title font-bold mt-2">전류와 전기 에너지</h1>
+      <p data-template-id="energy-description" class="canva-text text-sky-100/70 mt-3">전지, 전구, 스위치, 전선을 연결해 닫힌 회로를 만들어 보세요.</p>
      </div>
      <div class="grid lg:grid-cols-[.78fr_1.22fr] gap-6">
       <aside data-template-id="lab-control-panel" class="canva-panel lab-card rounded-2xl p-5">
-       <h2 data-template-id="lab-parts-title" class="canva-text font-bold"></h2>
-       <p data-template-id="lab-parts-help" class="canva-text text-sky-100/65 mt-2"></p>
+       <h2 data-template-id="lab-parts-title" class="canva-text font-bold">회로 부품</h2>
+       <p data-template-id="lab-parts-help" class="canva-text text-sky-100/65 mt-2">필요한 부품을 모두 선택한 뒤 회로 확인 버튼을 눌러 보세요.</p>
        <div class="grid grid-cols-2 gap-3 mt-5">
-        <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="battery" onclick="togglePart(this)"><i data-lucide="battery-charging" class="text-yellow-200"></i><span data-template-id="battery-label" class="canva-text block mt-2"></span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="bulb" onclick="togglePart(this)"><i data-lucide="lightbulb" class="text-yellow-200"></i><span data-template-id="bulb-label" class="canva-text block mt-2"></span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="switch" onclick="togglePart(this)"><i data-lucide="toggle-right" class="text-cyan-200"></i><span data-template-id="switch-label" class="canva-text block mt-2"></span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="wire" onclick="togglePart(this)"><i data-lucide="cable" class="text-violet-200"></i><span data-template-id="wire-label" class="canva-text block mt-2"></span></button>
-       </div><button data-template-id="check-circuit-button" type="button" onclick="checkCircuit()" class="canva-button main-btn w-full mt-5 rounded-xl py-3"></button>
+        <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="battery" onclick="togglePart(this)"><i data-lucide="battery-charging" class="text-yellow-200"></i><span data-template-id="battery-label" class="canva-text block mt-2">전지</span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="bulb" onclick="togglePart(this)"><i data-lucide="lightbulb" class="text-yellow-200"></i><span data-template-id="bulb-label" class="canva-text block mt-2">전구</span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="switch" onclick="togglePart(this)"><i data-lucide="toggle-right" class="text-cyan-200"></i><span data-template-id="switch-label" class="canva-text block mt-2">스위치</span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="wire" onclick="togglePart(this)"><i data-lucide="cable" class="text-violet-200"></i><span data-template-id="wire-label" class="canva-text block mt-2">전선</span></button>
+       </div><button data-template-id="check-circuit-button" type="button" onclick="checkCircuit()" class="canva-button main-btn w-full mt-5 rounded-xl py-3">회로 확인하기</button>
        <p id="lab-feedback" class="mt-4 rounded-xl border border-sky-300/15 bg-slate-950/35 p-4 text-sm text-sky-100/80" aria-live="polite"></p>
       </aside>
       <div data-template-id="circuit-board-panel" class="canva-panel lab-card rounded-2xl p-5 sm:p-8 min-h-[350px] flex flex-col">
-       <p data-template-id="circuit-board-label" class="canva-text mini-kicker"></p>
+       <p data-template-id="circuit-board-label" class="canva-text mini-kicker">CIRCUIT BOARD</p>
        <p id="circuit-status" class="font-bold text-sky-200 mt-2" aria-live="polite">전류 대기 중</p>
        <div class="flex-1 grid place-items-center">
         <svg viewbox="0 0 620 310" class="w-full max-w-2xl" role="img" aria-label="전기 회로 실험 보드">
@@ -160,25 +160,25 @@
      </div>
      <div class="mt-8 pt-6 border-t border-sky-300/15">
       <div class="flex items-center justify-between gap-3">
-       <p data-template-id="random-quiz-title" class="canva-text mini-kicker"></p>
+       <p data-template-id="random-quiz-title" class="canva-text mini-kicker">RANDOM QUIZ</p>
        <p id="quiz-score" class="text-sm font-bold text-yellow-100">문제 0 / 3</p>
       </div>
       <div id="random-quiz-content" class="mt-4"></div>
-      <p data-template-id="random-quiz-note" class="canva-text text-sky-100/55 mt-4"></p>
+      <p data-template-id="random-quiz-note" class="canva-text text-sky-100/55 mt-4">전기와 전기 에너지에 관한 문제 3개가 무작위로 출제됩니다.</p>
      </div>
     </section>
    </main>
   </div>
   <section id="magnet" class="view" aria-labelledby="magnet-title">
-   <button data-template-id="magnet-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="magnet-back-label" class="canva-text"></span> </button>
+   <button data-template-id="magnet-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="magnet-back-label" class="canva-text">← 홈으로 돌아가기</span> </button>
    <div class="mt-6 mb-7">
-    <p data-template-id="magnet-kicker" class="canva-text mini-kicker"></p>
-    <h1 id="magnet-title" data-template-id="magnet-title" class="canva-text page-title font-bold mt-2"></h1>
-    <p data-template-id="magnet-description" class="canva-text text-sky-100/70 mt-3"></p>
+    <p data-template-id="magnet-kicker" class="canva-text mini-kicker">MAGNETIC FIELD LAB</p>
+    <h1 id="magnet-title" data-template-id="magnet-title" class="canva-text page-title font-bold mt-2">전류의 자기 작용</h1>
+    <p data-template-id="magnet-description" class="canva-text text-sky-100/70 mt-3">자석의 극을 바꾸고 거리를 조절하며 자기장의 성질을 관찰해 보세요.</p>
    </div>
    <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-6">
     <div data-template-id="magnet-stage-panel" class="canva-panel lab-card rounded-2xl p-6">
-     <p data-template-id="magnet-stage-label" class="canva-text mini-kicker"></p>
+     <p data-template-id="magnet-stage-label" class="canva-text mini-kicker">MAGNETIC FIELD</p>
      <p id="magnet-result" class="font-bold text-yellow-100 mt-2" aria-live="polite">같은 극 → 서로 밀어냄</p>
      <div class="relative h-64 mt-4 rounded-2xl bg-[#061331] overflow-hidden border border-sky-300/15">
       <svg class="absolute inset-0 w-full h-full" viewbox="0 0 700 270" aria-hidden="true">
@@ -188,16 +188,16 @@
       </div>
       <div id="magnet-right" class="magnet absolute top-[92px] right-[21%] flex h-20 w-28 overflow-hidden rounded-xl border-2 border-white/40"><span id="right-pole" class="w-1/2 bg-red-500 grid place-items-center font-bold">N</span><span class="w-1/2 bg-blue-500 grid place-items-center font-bold">S</span>
       </div>
-     </div><label for="magnet-distance" data-template-id="distance-label" class="canva-text block font-bold mt-5"></label> <input id="magnet-distance" type="range" min="0" max="100" value="50" class="w-full accent-yellow-300 mt-2" oninput="updateMagnet()">
+     </div><label for="magnet-distance" data-template-id="distance-label" class="canva-text block font-bold mt-5">자석 사이 거리</label> <input id="magnet-distance" type="range" min="0" max="100" value="50" class="w-full accent-yellow-300 mt-2" oninput="updateMagnet()">
      <div class="grid sm:grid-cols-2 gap-3 mt-4">
-      <button data-template-id="same-pole-button" type="button" onclick="setPoles(true)" class="canva-button main-btn rounded-xl py-3"></button> <button data-template-id="different-pole-button" type="button" onclick="setPoles(false)" class="canva-button main-btn rounded-xl py-3"></button>
+      <button data-template-id="same-pole-button" type="button" onclick="setPoles(true)" class="canva-button main-btn rounded-xl py-3">같은 극</button> <button data-template-id="different-pole-button" type="button" onclick="setPoles(false)" class="canva-button main-btn rounded-xl py-3">다른 극</button>
      </div>
     </div>
     <aside data-template-id="magnet-question-panel" class="canva-panel lab-card rounded-2xl p-6">
-     <p data-template-id="magnet-question-kicker" class="canva-text mini-kicker"></p>
-     <h2 data-template-id="magnet-question-title" class="canva-text font-bold mt-2"></h2>
+     <p data-template-id="magnet-question-kicker" class="canva-text mini-kicker">QUICK CHECK</p>
+     <h2 data-template-id="magnet-question-title" class="canva-text font-bold mt-2">같은 극의 자석을 가까이 하면 어떻게 될까요?</h2>
      <div class="space-y-3 mt-5">
-      <button type="button" onclick="answerMagnet(false,this)" class="answer w-full text-left rounded-xl border border-sky-300/20 bg-slate-950/35 p-4"><span data-template-id="magnet-answer-attract" class="canva-text"></span></button> <button type="button" onclick="answerMagnet(true,this)" class="answer w-full text-left rounded-xl border border-sky-300/20 bg-slate-950/35 p-4"><span data-template-id="magnet-answer-repel" class="canva-text"></span></button>
+      <button type="button" onclick="answerMagnet(false,this)" class="answer w-full text-left rounded-xl border border-sky-300/20 bg-slate-950/35 p-4"><span data-template-id="magnet-answer-attract" class="canva-text">서로 끌어당긴다</span></button> <button type="button" onclick="answerMagnet(true,this)" class="answer w-full text-left rounded-xl border border-sky-300/20 bg-slate-950/35 p-4"><span data-template-id="magnet-answer-repel" class="canva-text">서로 밀어낸다</span></button>
      </div>
      <p id="magnet-feedback" class="mt-5 text-sm text-sky-100/75" aria-live="polite"></p>
     </aside>
