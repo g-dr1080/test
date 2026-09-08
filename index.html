@@ -20,7 +20,7 @@
     .lab-card { background:linear-gradient(145deg,rgba(21,42,91,.95),rgba(8,20,53,.97)); border:1px solid var(--line); box-shadow:0 18px 50px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.05); }
     .neon-border { position:relative; }
     .neon-border::before { content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px; background:linear-gradient(120deg,rgba(96,223,255,.78),rgba(167,139,250,.05),rgba(248,239,86,.55)); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
-    .view { display:none; animation:reveal .35s ease both; }
+    .view { display:none; width:100%; max-width:100%; min-width:0; animation:reveal .35s ease both; }
     .view.active { display:block; }
     @keyframes reveal { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
     .page-title,.mini-kicker { font-family:"Space Mono",monospace; }
@@ -153,8 +153,8 @@
       <h1 id="generation-title" class="canva-text page-title font-bold mt-2">전기의 발생</h1>
       <p class="canva-text text-sky-100/75 mt-3 max-w-3xl leading-relaxed">마찰하기 전에는 중성이던 빨대와 털가죽에서, 마찰 뒤 전자가 어떻게 이동하여 서로 다른 전하를 띠게 되는지 단계별로 살펴보세요.</p>
 
-      <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-5 mt-6">
-       <div class="rounded-2xl border border-cyan-300/20 bg-slate-950/30 p-4 sm:p-5">
+      <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-5 mt-6 min-w-0">
+       <div class="min-w-0 rounded-2xl border border-cyan-300/20 bg-slate-950/30 p-4 sm:p-5">
         <div class="flex items-center justify-between gap-3 flex-wrap">
          <div>
           <p class="mini-kicker">STEP <span id="static-step-number">1</span> / 4</p>
@@ -171,16 +171,14 @@
          </div>
          <div id="lesson-straw" class="charge-object straw-object absolute right-[7%] bottom-[42px] w-[96px] h-[235px] rounded-[48px] border-4 border-cyan-200/60 bg-cyan-200/15 rotate-[10deg] shadow-lg">
           <div class="charge-particles" id="straw-particles" aria-label="빨대 내부의 전하"></div>
-          <div class="charge-object-label"><div class="text-3xl">🥤</div><b class="block mt-2">빨대</b><span id="straw-charge" class="text-xs text-sky-100/65">중성</span></div>
-         </div>
-<b class="block mt-2">빨대</b><span id="straw-charge" class="text-xs text-sky-100/65">중성 (0)</span></div>
+          <div class="charge-object-label"><div class="text-3xl">🥤</div><b class="block mt-2">빨대</b><span id="straw-charge" class="text-xs text-sky-100/65">중성 · (+)와 (−)가 같음</span></div>
          </div>
          <div id="static-electron-layer" class="absolute inset-0 pointer-events-none"></div>
          <div id="static-step-caption" class="absolute left-1/2 -translate-x-1/2 bottom-5 w-[92%] rounded-xl border border-white/10 bg-slate-950/55 px-4 py-3 text-center text-sm leading-relaxed text-sky-100/75">마찰하기 전에는 두 물체의 (+)전하와 (−)전하가 균형을 이루어 전기적으로 중성입니다.</div>
         </div>
        </div>
 
-       <aside class="rounded-2xl border border-yellow-300/20 bg-slate-950/25 p-5">
+       <aside class="min-w-0 rounded-2xl border border-yellow-300/20 bg-slate-950/25 p-5">
         <p class="mini-kicker">핵심 정리</p>
         <h2 class="font-bold text-xl mt-2">왜 빨대가 −전하가 될까?</h2>
         <div class="space-y-3 mt-5">
@@ -200,7 +198,7 @@
       <div class="mt-5 rounded-2xl border border-cyan-300/15 bg-slate-950/25 p-5">
        <p class="mini-kicker">관찰하기</p>
        <div class="grid sm:grid-cols-4 gap-3 mt-4">
-        <button type="button" onclick="setStaticLessonStep(1)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>1</b><span class="block text-sm mt-1 text-sky-100/70">마찰 전</span></button>
+        <button type="button" onclick="setStaticLessonStep(1)" class="static-lesson-dot active rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>1</b><span class="block text-sm mt-1 text-sky-100/70">마찰 전</span></button>
         <button type="button" onclick="setStaticLessonStep(2)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>2</b><span class="block text-sm mt-1 text-sky-100/70">마찰 시작</span></button>
         <button type="button" onclick="setStaticLessonStep(3)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>3</b><span class="block text-sm mt-1 text-sky-100/70">전자 이동</span></button>
         <button type="button" onclick="setStaticLessonStep(4)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>4</b><span class="block text-sm mt-1 text-sky-100/70">마찰 후</span></button>
@@ -220,8 +218,8 @@
        <div><p class="mini-kicker">CIRCUIT BUILDER</p><h2 class="font-bold text-xl mt-1">드래그해서 회로 만들기</h2><p class="builder-hint mt-2">왼쪽 부품을 오른쪽 회로판으로 끌어다 놓으세요. 부품은 회로판 안에서 다시 움직일 수도 있어요.</p></div>
        <button type="button" onclick="resetCircuitBuilder()" class="main-btn rounded-xl px-4 py-2 border border-sky-300/20 bg-slate-950/30">처음부터 다시</button>
       </div>
-      <div class="grid lg:grid-cols-[.65fr_1.35fr] gap-5 mt-6">
-       <aside class="rounded-2xl border border-sky-300/15 bg-slate-950/25 p-4">
+      <div class="grid lg:grid-cols-[.65fr_1.35fr] gap-5 mt-6 min-w-0">
+       <aside class="min-w-0 rounded-2xl border border-sky-300/15 bg-slate-950/25 p-4">
         <h3 class="font-bold">부품</h3>
         <div class="grid grid-cols-2 lg:grid-cols-1 gap-3 mt-4">
          <div draggable="true" class="builder-piece rounded-xl border border-yellow-300/25 bg-yellow-300/10 p-4" data-piece="battery" ondragstart="dragPiece(event)"><i data-lucide="battery-charging" class="text-yellow-200"></i><b class="block mt-2">전지</b><span class="text-xs text-sky-100/55">전기 에너지원</span></div>
@@ -266,8 +264,8 @@
     <h1 id="magnet-title" data-template-id="magnet-title" class="canva-text page-title font-bold mt-2">전류의 자기 작용</h1>
     <p data-template-id="magnet-description" class="canva-text text-sky-100/70 mt-3">자석의 극을 바꾸고 거리를 조절하며 자기장의 성질을 관찰해 보세요.</p>
    </div>
-   <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-6">
-    <div data-template-id="magnet-stage-panel" class="canva-panel lab-card rounded-2xl p-6">
+   <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-6 min-w-0">
+    <div data-template-id="magnet-stage-panel" class="canva-panel lab-card rounded-2xl p-6 min-w-0">
      <p data-template-id="magnet-stage-label" class="canva-text mini-kicker">MAGNETIC FIELD</p>
      <p id="magnet-result" class="font-bold text-yellow-100 mt-2" aria-live="polite">같은 극 → 서로 밀어냄</p>
      <div class="relative h-64 mt-4 rounded-2xl bg-[#061331] overflow-hidden border border-sky-300/15">
@@ -283,7 +281,7 @@
       <button data-template-id="same-pole-button" type="button" onclick="setPoles(true)" class="canva-button main-btn rounded-xl py-3">같은 극</button> <button data-template-id="different-pole-button" type="button" onclick="setPoles(false)" class="canva-button main-btn rounded-xl py-3">다른 극</button>
      </div>
     </div>
-    <aside data-template-id="magnet-question-panel" class="canva-panel lab-card rounded-2xl p-6">
+    <aside data-template-id="magnet-question-panel" class="canva-panel lab-card rounded-2xl p-6 min-w-0">
      <p data-template-id="magnet-question-kicker" class="canva-text mini-kicker">QUICK CHECK</p>
      <h2 data-template-id="magnet-question-title" class="canva-text font-bold mt-2">같은 극의 자석을 가까이 하면 어떻게 될까요?</h2>
      <div class="space-y-3 mt-5">
