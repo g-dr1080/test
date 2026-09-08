@@ -56,6 +56,29 @@
     .quiz-next { margin-top:15px; border:0; border-radius:10px; padding:12px 20px; cursor:pointer; font-weight:700; font-size:.95rem; background:#f8ef56; color:#07112b; }
     .quiz-result { padding:35px 8px; text-align:center; font-weight:700; line-height:2; font-size:1.1rem; }
     .quiz-reset-note { margin-top:18px; opacity:.55; font-size:.8rem; text-align:center; }
+    .builder-piece { cursor:grab; user-select:none; -webkit-user-select:none; }
+    .builder-piece:active { cursor:grabbing; }
+    .circuit-dropzone { position:relative; min-height:390px; border:1px dashed rgba(96,223,255,.35); border-radius:18px; background:rgba(2,10,28,.45); overflow:hidden; }
+    .circuit-dropzone.dragover { border-color:#f8ef56; background:rgba(248,239,86,.06); }
+    .placed-piece { position:absolute; transform:translate(-50%,-50%); cursor:grab; z-index:3; }
+    .builder-hint { font-size:.85rem; color:rgba(234,247,255,.62); line-height:1.5; }
+    .circuit-wire-preview { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+    .builder-status { min-height:24px; }
+    .circuit-result { display:none; margin-top:18px; padding:18px; border:1px solid rgba(96,223,255,.2); border-radius:18px; background:rgba(2,10,28,.45); }
+    .circuit-result.show { display:block; animation:reveal .35s ease both; }
+    .circuit-result svg { display:block; width:100%; height:auto; min-height:230px; }
+    .result-wire { stroke:#f8ef56; stroke-width:6; stroke-linecap:round; fill:none; filter:drop-shadow(0 0 5px rgba(248,239,86,.7)); }
+    .result-component { fill:#132752; stroke:#a6e9ff; stroke-width:3; }
+    .result-label { fill:#eaf7ff; font-size:15px; font-weight:700; text-anchor:middle; }
+    .result-note { color:rgba(234,247,255,.62); font-size:.82rem; margin-top:8px; }
+    .schematic-legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .schematic-chip { padding:6px 10px; border-radius:999px; border:1px solid rgba(120,150,180,.3); background:rgba(255,255,255,.04); font-size:.78rem; }
+    .result-terminal { fill:#f8ef56; }
+    .result-wire-plain { stroke:#eaf7ff; stroke-width:4; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .result-symbol { stroke:#eaf7ff; fill:none; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .result-bulb { stroke:#f8ef56; fill:none; stroke-width:4; }
+    .result-trap { stroke:#ff9fb0; fill:none; stroke-width:4; }
+
     @media(max-width:600px){ .random-options { grid-template-columns:1fr !important; } }
   </style>
   <script src="/_sdk/fcb6dc01f91829ac.resizing_sdk.js" type="text/javascript" integrity="sha512-YK8JfnN705qaEaVhiL7pcVB2Rs/BbdX5yxV55Az8zT/1JanyEWTw9HqCF915m9iV1YEaoil8qsjJz03l1Kb0Ug=="></script>
@@ -131,40 +154,54 @@
      </div>
     </section>
     <section id="energy" class="view" aria-labelledby="energy-title">
-     <button data-template-id="energy-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="energy-back-label" class="canva-text">← 홈으로 돌아가기</span> </button>
+     <button data-template-id="energy-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span class="canva-text">← 홈으로 돌아가기</span> </button>
      <div class="mt-6 mb-7">
-      <p data-template-id="energy-kicker" class="canva-text mini-kicker">ELECTRIC CURRENT LAB</p>
-      <h1 id="energy-title" data-template-id="energy-title" class="canva-text page-title font-bold mt-2">전류와 전기 에너지</h1>
-      <p data-template-id="energy-description" class="canva-text text-sky-100/70 mt-3">전지, 전구, 스위치, 전선을 연결해 닫힌 회로를 만들어 보세요.</p>
+      <p class="canva-text mini-kicker">ELECTRIC CURRENT LAB</p>
+      <h1 id="energy-title" class="canva-text page-title font-bold mt-2">전류와 전기 에너지</h1>
+      <p class="canva-text text-sky-100/70 mt-3">전지, 전구, 스위치, 전선을 직접 배치해 닫힌 회로를 만들어 보세요.</p>
      </div>
-     <div class="grid lg:grid-cols-[.78fr_1.22fr] gap-6">
-      <aside data-template-id="lab-control-panel" class="canva-panel lab-card rounded-2xl p-5">
-       <h2 data-template-id="lab-parts-title" class="canva-text font-bold">회로 부품</h2>
-       <p data-template-id="lab-parts-help" class="canva-text text-sky-100/65 mt-2">필요한 부품을 모두 선택한 뒤 회로 확인 버튼을 눌러 보세요.</p>
-       <div class="grid grid-cols-2 gap-3 mt-5">
-        <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="battery" onclick="togglePart(this)"><i data-lucide="battery-charging" class="text-yellow-200"></i><span data-template-id="battery-label" class="canva-text block mt-2">전지</span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="bulb" onclick="togglePart(this)"><i data-lucide="lightbulb" class="text-yellow-200"></i><span data-template-id="bulb-label" class="canva-text block mt-2">전구</span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="switch" onclick="togglePart(this)"><i data-lucide="toggle-right" class="text-cyan-200"></i><span data-template-id="switch-label" class="canva-text block mt-2">스위치</span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="wire" onclick="togglePart(this)"><i data-lucide="cable" class="text-violet-200"></i><span data-template-id="wire-label" class="canva-text block mt-2">전선</span></button>
-       </div><button data-template-id="check-circuit-button" type="button" onclick="checkCircuit()" class="canva-button main-btn w-full mt-5 rounded-xl py-3">회로 확인하기</button>
-       <p id="lab-feedback" class="mt-4 rounded-xl border border-sky-300/15 bg-slate-950/35 p-4 text-sm text-sky-100/80" aria-live="polite"></p>
-      </aside>
-      <div data-template-id="circuit-board-panel" class="canva-panel lab-card rounded-2xl p-5 sm:p-8 min-h-[350px] flex flex-col">
-       <p data-template-id="circuit-board-label" class="canva-text mini-kicker">CIRCUIT BOARD</p>
-       <p id="circuit-status" class="font-bold text-sky-200 mt-2" aria-live="polite">전류 대기 중</p>
-       <div class="flex-1 grid place-items-center">
-        <svg viewbox="0 0 620 310" class="w-full max-w-2xl" role="img" aria-label="전기 회로 실험 보드">
-         <path class="wire-path" d="M120 78 H250 M370 78 H500 V230"></path> <path class="wire-path" d="M500 230 H370 M250 230 H120 V78"></path> <rect x="72" y="117" width="96" height="75" rx="11" fill="#19375f" stroke="#a6e9ff" stroke-width="3"></rect> <text x="108" y="162" fill="#f8ef56" font-size="31" font-weight="bold">
-          + −
-         </text> <rect x="250" y="56" width="120" height="44" rx="13" fill="#17335c" stroke="#a6e9ff" stroke-width="3"></rect> <circle cx="278" cy="78" r="7" fill="#60dfff"></circle> <path d="M293 78 H338" stroke="#d9f7ff" stroke-width="5"></path> <circle cx="310" cy="230" r="58" fill="#10264f" stroke="#a6e9ff" stroke-width="4"></circle> <circle id="bulb-glass" class="bulb-glass" cx="310" cy="222" r="27"></circle> <path d="M291 258 H329 M296 267 H324" stroke="#a6e9ff" stroke-width="5"></path>
-        </svg>
+     <div class="lab-card rounded-2xl p-5 sm:p-7">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+       <div><p class="mini-kicker">CIRCUIT BUILDER</p><h2 class="font-bold text-xl mt-1">드래그해서 회로 만들기</h2><p class="builder-hint mt-2">왼쪽 부품을 오른쪽 회로판으로 끌어다 놓으세요. 부품은 회로판 안에서 다시 움직일 수도 있어요.</p></div>
+       <button type="button" onclick="resetCircuitBuilder()" class="main-btn rounded-xl px-4 py-2 border border-sky-300/20 bg-slate-950/30">처음부터 다시</button>
+      </div>
+      <div class="grid lg:grid-cols-[.65fr_1.35fr] gap-5 mt-6">
+       <aside class="rounded-2xl border border-sky-300/15 bg-slate-950/25 p-4">
+        <h3 class="font-bold">부품</h3>
+        <div class="grid grid-cols-2 lg:grid-cols-1 gap-3 mt-4">
+         <div draggable="true" class="builder-piece rounded-xl border border-yellow-300/25 bg-yellow-300/10 p-4" data-piece="battery" ondragstart="dragPiece(event)"><i data-lucide="battery-charging" class="text-yellow-200"></i><b class="block mt-2">전지</b><span class="text-xs text-sky-100/55">전기 에너지원</span></div>
+         <div draggable="true" class="builder-piece rounded-xl border border-yellow-300/25 bg-yellow-300/10 p-4" data-piece="bulb" ondragstart="dragPiece(event)"><i data-lucide="lightbulb" class="text-yellow-200"></i><b class="block mt-2">전구</b><span class="text-xs text-sky-100/55">빛으로 에너지 사용</span></div>
+         <div draggable="true" class="builder-piece rounded-xl border border-cyan-300/25 bg-cyan-300/10 p-4" data-piece="switch" ondragstart="dragPiece(event)"><i data-lucide="toggle-right" class="text-cyan-200"></i><b class="block mt-2">스위치</b><span class="text-xs text-sky-100/55">회로 연결/차단</span></div>
+         <div draggable="true" class="builder-piece rounded-xl border border-violet-300/25 bg-violet-300/10 p-4" data-piece="wire" ondragstart="dragPiece(event)"><i data-lucide="cable" class="text-violet-200"></i><b class="block mt-2">전선</b><span class="text-xs text-sky-100/55">전류가 지나가는 길</span></div>
+         <div draggable="true" class="builder-piece rounded-xl border border-pink-300/25 bg-pink-300/10 p-4" data-piece="resistor" ondragstart="dragPiece(event)"><i data-lucide="rectangle-horizontal" class="text-pink-200"></i><b class="block mt-2">저항</b><span class="text-xs text-sky-100/55">전류의 흐름을 방해</span></div>
+         <div draggable="true" class="builder-piece rounded-xl border border-emerald-300/25 bg-emerald-300/10 p-4" data-piece="motor" ondragstart="dragPiece(event)"><i data-lucide="fan" class="text-emerald-200"></i><b class="block mt-2">모터</b><span class="text-xs text-sky-100/55">전기 에너지를 운동으로</span></div>
+         <div draggable="true" class="builder-piece rounded-xl border border-orange-300/25 bg-orange-300/10 p-4" data-piece="ammeter" ondragstart="dragPiece(event)"><i data-lucide="gauge" class="text-orange-200"></i><b class="block mt-2">전류계</b><span class="text-xs text-sky-100/55">전류 측정</span></div>
+         <div draggable="true" class="builder-piece rounded-xl border border-indigo-300/25 bg-indigo-300/10 p-4" data-piece="voltmeter" ondragstart="dragPiece(event)"><i data-lucide="gauge-circle" class="text-indigo-200"></i><b class="block mt-2">전압계</b><span class="text-xs text-sky-100/55">전압 측정</span></div>
+        </div>
+       </aside>
+       <div>
+        <div id="circuit-dropzone" class="circuit-dropzone" ondragover="allowCircuitDrop(event)" ondrop="dropCircuitPiece(event)" ondragleave="this.classList.remove('dragover')">
+         <svg class="circuit-wire-preview" viewBox="0 0 800 390" preserveAspectRatio="none" aria-hidden="true">
+          <path id="builder-wire-1" d="M170 95 H300" fill="none" stroke="#355d88" stroke-width="7" stroke-linecap="round"></path><path id="builder-wire-2" d="M500 95 H630 V290" fill="none" stroke="#355d88" stroke-width="7" stroke-linecap="round"></path><path id="builder-wire-3" d="M630 290 H500" fill="none" stroke="#355d88" stroke-width="7" stroke-linecap="round"></path><path id="builder-wire-4" d="M300 290 H170 V95" fill="none" stroke="#355d88" stroke-width="7" stroke-linecap="round"></path>
+         </svg>
+         <div class="absolute inset-0 grid place-items-center pointer-events-none z-[2]"><div id="builder-empty-message" class="text-center px-5"><i data-lucide="move" class="w-9 h-9 mx-auto text-cyan-200/60"></i><p class="font-bold mt-2">부품을 이곳으로 끌어오세요</p><p class="text-sm text-sky-100/50 mt-1">부품을 자유롭게 배치해 보세요. 틀린 회로도 그대로 그려집니다.</p></div></div>
+        </div>
+        <p id="builder-status" class="builder-status mt-4 text-yellow-100 font-bold" aria-live="polite">아직 회로가 완성되지 않았어요.</p>
+        <button type="button" onclick="checkCircuitBuilder()" class="main-btn w-full mt-3 rounded-xl py-3 bg-yellow-300 text-[#07112b] font-bold">회로 확인하기 ⚡</button>
+        <div id="circuit-result" class="circuit-result">
+         <p class="mini-kicker">YOUR CIRCUIT</p>
+         <h3 class="font-bold text-lg mt-1">내가 만든 회로도</h3>
+         <svg id="circuit-result-svg" viewBox="0 0 800 400" role="img" aria-label="내가 만든 회로도"></svg>
+         <p id="circuit-result-judgement" class="font-bold mt-2"></p>
+         <p class="result-note">확인 결과와 상관없이 네가 배치한 부품을 그대로 회로도 기호로 다시 그립니다.</p>
+         <div id="schematic-legend" class="schematic-legend"></div>
+        </div>
        </div>
       </div>
      </div>
      <div class="mt-8 pt-6 border-t border-sky-300/15">
-      <div class="flex items-center justify-between gap-3">
-       <p data-template-id="random-quiz-title" class="canva-text mini-kicker">RANDOM QUIZ</p>
-       <p id="quiz-score" class="text-sm font-bold text-yellow-100">문제 0 / 3</p>
-      </div>
-      <div id="random-quiz-content" class="mt-4"></div>
-      <p data-template-id="random-quiz-note" class="canva-text text-sky-100/55 mt-4">전기와 전기 에너지에 관한 문제 3개가 무작위로 출제됩니다.</p>
+      <div class="flex items-center justify-between gap-3"><p class="canva-text mini-kicker">RANDOM QUIZ · 10문제 중 3문제</p><p id="quiz-score" class="text-sm font-bold text-yellow-100">문제 0 / 3</p></div>
+      <div id="random-quiz-content" class="mt-4"></div><p class="canva-text text-sky-100/55 mt-4">이 탭을 열 때마다 준비된 10문제 중 무작위로 3문제가 출제됩니다.</p>
      </div>
     </section>
   <section id="magnet" class="view" aria-labelledby="magnet-title">
@@ -265,6 +302,7 @@
       document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === id));
       window.scrollTo({ top:0, behavior:"smooth" });
       if (id === "generation") resetStaticLab();
+      if (id === "energy") { setupRandomQuiz(); resetCircuitBuilder(); }
     }
 
     // 정전기 실험(빨대·풍선) 상태를 처음 화면으로 되돌리는 함수.
@@ -369,6 +407,184 @@
         feedback.textContent = "아쉬워요. 같은 극끼리는 서로 밀어냅니다.";
         saveChanges({ solved_questions:state.solved_questions + 1 });
       }
+    }
+
+    let circuitPlaced = new Map();
+    let draggedPiece = null;
+    let placementSeq = 0;
+
+    const pieceInfo = {
+      battery:{label:"전지", icon:"battery-charging", type:"source"},
+      bulb:{label:"전구", icon:"lightbulb", type:"load"},
+      switch:{label:"스위치", icon:"toggle-right", type:"switch"},
+      wire:{label:"전선", icon:"cable", type:"wire"},
+      resistor:{label:"저항", icon:"rectangle-horizontal", type:"resistor"},
+      motor:{label:"모터", icon:"fan", type:"motor"},
+      ammeter:{label:"전류계", icon:"gauge", type:"ammeter"},
+      voltmeter:{label:"전압계", icon:"gauge-circle", type:"voltmeter"}
+    };
+
+    function dragPiece(event) {
+      draggedPiece = event.currentTarget.dataset.piece;
+      event.dataTransfer.effectAllowed = "copy";
+      event.dataTransfer.setData("text/plain", draggedPiece);
+    }
+    function allowCircuitDrop(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "copy";
+      event.currentTarget.classList.add("dragover");
+    }
+    function dropCircuitPiece(event) {
+      event.preventDefault();
+      const zone=event.currentTarget;
+      zone.classList.remove("dragover");
+      let data=event.dataTransfer.getData("text/plain") || draggedPiece;
+      if(data.startsWith("move:")) data=data.slice(5);
+      if(!data || !pieceInfo[data]) return;
+      const r=zone.getBoundingClientRect();
+      const x=Math.max(55,Math.min(r.width-55,event.clientX-r.left));
+      const y=Math.max(45,Math.min(r.height-45,event.clientY-r.top));
+      placeCircuitPiece(data,x,y);
+    }
+    function placeCircuitPiece(piece,x,y) {
+      const zone=document.getElementById("circuit-dropzone");
+      const info=pieceInfo[piece];
+      const existing=document.getElementById("placed-"+piece);
+      if(existing) existing.remove();
+      placementSeq++;
+      const el=document.createElement("div");
+      el.id="placed-"+piece;
+      el.className="placed-piece rounded-xl border border-sky-200/30 bg-[#132752] px-3 py-3 min-w-[88px] text-center shadow-lg";
+      el.innerHTML='<i data-lucide="'+info.icon+'" class="w-6 h-6 mx-auto text-yellow-200"></i><b class="block mt-1 text-sm">'+info.label+'</b>';
+      el.style.left=x+"px"; el.style.top=y+"px"; el.dataset.piece=piece; el.draggable=true;
+      el.addEventListener("dragstart",dragPlacedPiece);
+      zone.appendChild(el);
+      circuitPlaced.set(piece,{x,y,order:placementSeq});
+      document.getElementById("builder-empty-message").style.display="none";
+      lucide.createIcons();
+      updateCircuitPreview();
+    }
+    function dragPlacedPiece(event) {
+      const piece=event.currentTarget.dataset.piece;
+      draggedPiece=piece;
+      event.dataTransfer.effectAllowed="move";
+      event.dataTransfer.setData("text/plain","move:"+piece);
+    }
+    function resetCircuitBuilder() {
+      circuitPlaced.clear(); placementSeq=0;
+      document.querySelectorAll("#circuit-dropzone .placed-piece").forEach(e=>e.remove());
+      document.getElementById("builder-empty-message").style.display="";
+      document.getElementById("builder-status").textContent="아직 회로가 완성되지 않았어요.";
+      const result=document.getElementById("circuit-result"); if(result) result.classList.remove("show");
+      updateCircuitPreview();
+    }
+    function updateCircuitPreview() {
+      const complete=["battery","bulb","switch","wire"].every(p=>circuitPlaced.has(p));
+      [1,2,3,4].forEach(n=>{
+        const path=document.getElementById("builder-wire-"+n);
+        if(!path) return;
+        path.setAttribute("stroke",complete?"#f8ef56":"#355d88");
+        path.style.filter=complete?"drop-shadow(0 0 5px #f8ef56)":"none";
+      });
+    }
+
+    function createSvgEl(tag, attrs={}, text="") {
+      const el=document.createElementNS("http://www.w3.org/2000/svg",tag);
+      Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,String(v)));
+      if(text) el.textContent=text;
+      return el;
+    }
+
+    function drawSchematicComponent(svg, piece, x, y) {
+      const g=createSvgEl("g",{transform:`translate(${x} ${y})`});
+      const info=pieceInfo[piece];
+      // terminals
+      svg.appendChild(createSvgEl("circle",{cx:x-34,cy:y,r:4,class:"result-terminal"}));
+      svg.appendChild(createSvgEl("circle",{cx:x+34,cy:y,r:4,class:"result-terminal"}));
+      if(piece==='battery'){
+        g.appendChild(createSvgEl("line",{x1:-10,y1:-22,x2:-10,y2:22,class:"result-symbol"}));
+        g.appendChild(createSvgEl("line",{x1:10,y1:-12,x2:10,y2:12,class:"result-symbol"}));
+        g.appendChild(createSvgEl("text",{x:-17,y:-28,fill:"#f8ef56","font-size":14,"font-weight":800},"+"));
+        g.appendChild(createSvgEl("text",{x:13,y:-18,fill:"#eaf7ff","font-size":14,"font-weight":800},"−"));
+      } else if(piece==='bulb'){
+        g.appendChild(createSvgEl("circle",{cx:0,cy:0,r:18,class:"result-bulb"}));
+        g.appendChild(createSvgEl("path",{d:"M-8 9 L8 -9 M-8 -9 L8 9",class:"result-bulb"}));
+        g.appendChild(createSvgEl("path",{d:"M-10 24 H10 M-7 30 H7",class:"result-symbol"}));
+      } else if(piece==='switch'){
+        g.appendChild(createSvgEl("circle",{cx:-18,cy:10,r:4,fill:"#f8ef56"}));
+        g.appendChild(createSvgEl("circle",{cx:18,cy:-10,r:4,fill:"#f8ef56"}));
+        g.appendChild(createSvgEl("line",{x1:-18,y1:10,x2:16,y2:-8,class:"result-symbol"}));
+      } else if(piece==='wire'){
+        g.appendChild(createSvgEl("line",{x1:-28,y1:0,x2:28,y2:0,class:"result-wire-plain"}));
+      } else if(piece==='resistor'){
+        g.appendChild(createSvgEl("polyline",{points:"-28,0 -20,-12 -8,12 4,-12 16,12 28,0",class:"result-symbol"}));
+      } else if(piece==='motor'){
+        g.appendChild(createSvgEl("circle",{cx:0,cy:0,r:20,class:"result-symbol"}));
+        g.appendChild(createSvgEl("text",{x:0,y:7,fill:"#eaf7ff","font-size":20,"font-weight":800,"text-anchor":"middle"},"M"));
+      } else if(piece==='ammeter'){
+        g.appendChild(createSvgEl("circle",{cx:0,cy:0,r:20,class:"result-symbol"}));
+        g.appendChild(createSvgEl("text",{x:0,y:7,fill:"#eaf7ff","font-size":20,"font-weight":800,"text-anchor":"middle"},"A"));
+      } else if(piece==='voltmeter'){
+        g.appendChild(createSvgEl("circle",{cx:0,cy:0,r:20,class:"result-symbol"}));
+        g.appendChild(createSvgEl("text",{x:0,y:7,fill:"#eaf7ff","font-size":20,"font-weight":800,"text-anchor":"middle"},"V"));
+      }
+      g.appendChild(createSvgEl("text",{x:0,y:52,"class":"result-label"},info.label));
+      svg.appendChild(g);
+    }
+
+    function circuitJudgement(){
+      const has=p=>circuitPlaced.has(p);
+      const traps=["resistor","motor","ammeter","voltmeter"].filter(has);
+      const missing=["battery","bulb","switch","wire"].filter(p=>!has(p));
+      const tooManyBattery = (has("battery") && [...circuitPlaced.keys()].filter(k=>k==='battery').length>1);
+      if(missing.length===0 && traps.length===0 && !tooManyBattery){
+        return {ok:true, text:"정답이에요! 기본 전기 회로에 필요한 전지·스위치·전구·전선이 모두 들어 있습니다. ⚡"};
+      }
+      const reasons=[];
+      if(missing.length) reasons.push("필수 부품 부족: "+missing.map(p=>pieceInfo[p].label).join(", "));
+      if(traps.length) reasons.push("기본 회로에 필요하지 않은 부품이 포함됨: "+traps.map(p=>pieceInfo[p].label).join(", "));
+      return {ok:false,text:"틀렸어요. "+reasons.join(" · ")};
+    }
+
+    function drawCircuitResult() {
+      const svg=document.getElementById("circuit-result-svg");
+      if(!svg) return;
+      svg.innerHTML="";
+      const zone=document.getElementById("circuit-dropzone");
+      const zw=zone.clientWidth||800, zh=zone.clientHeight||390;
+      const items=[...circuitPlaced.entries()].sort((a,b)=>a[1].order-b[1].order);
+      if(!items.length) return;
+      const points=items.map(([piece,pos])=>({piece,x:70+(pos.x/zw)*660,y:65+(pos.y/zh)*270,order:pos.order}));
+      // Draw wires between the components in the same placement order, preserving wrong layouts too.
+      for(let i=0;i<points.length-1;i++){
+        const a=points[i], b=points[i+1];
+        const pa={x:a.x+(a.x<b.x?34:-34),y:a.y}, pb={x:b.x+(b.x<a.x?34:-34),y:b.y};
+        svg.appendChild(createSvgEl("path",{d:`M ${pa.x} ${pa.y} L ${pb.x} ${pb.y}`,class:"result-wire-plain"}));
+      }
+      if(points.length>2){
+        const a=points[points.length-1], b=points[0];
+        const pa={x:a.x+(a.x<b.x?34:-34),y:a.y}, pb={x:b.x+(b.x<a.x?34:-34),y:b.y};
+        svg.appendChild(createSvgEl("path",{d:`M ${pa.x} ${pa.y} L ${pb.x} ${pb.y}`,class:"result-wire-plain"}));
+      }
+      points.forEach(pt=>drawSchematicComponent(svg,pt.piece,pt.x,pt.y));
+      const verdict=circuitJudgement();
+      const result=document.getElementById("circuit-result-judgement");
+      result.textContent=verdict.text;
+      result.style.color=verdict.ok?"#74f7bf":"#ff9fb0";
+      const legend=document.getElementById("schematic-legend");
+      if(legend){ legend.innerHTML="<span class='schematic-chip'>회로도 기호로 표시</span><span class='schematic-chip'>배치 순서대로 연결</span><span class='schematic-chip'>틀린 회로도 그대로 표시</span>"; }
+    }
+
+    function checkCircuitBuilder() {
+      if(circuitPlaced.size===0){
+        document.getElementById("builder-status").textContent="부품을 하나 이상 배치한 뒤 확인해 주세요.";
+        return;
+      }
+      drawCircuitResult();
+      document.getElementById("circuit-result").classList.add("show");
+      const verdict=circuitJudgement();
+      document.getElementById("builder-status").textContent=verdict.ok?"정답! 회로 조건을 만족했어요. ⚡":"틀렸어요. 하지만 네가 만든 회로도는 그대로 표시했어요.";
+      if(verdict.ok) award("drag-circuit",100,{completed_experiments:state.completed_experiments+1},"직접 회로 완성!");
     }
 
     const randomQuizBank = [
