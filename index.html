@@ -1,10 +1,453 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>내 첫 사이트</title>
-</head>
-<body>
-  <h1>안녕하세요 😎</h1>
-  <p>재형의 첫 GitHub 사이트</p>
-</body>
+<!doctype html>
+<html lang="ko">
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260908-05-b9d8a99","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/9e99ecf74af2a081.telemetry_sdk.js" integrity="sha512-tZ7fmfTx2KpCLjXQnEuL9azQ4A5+7+xumsx6r/WYVD0zCP/8LP8hDeCypMQesmP+WyAew4g7l5Ah23Bjd6yoVg=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ELECTRO LAB | 전기와 자기</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/fbe2ebfd64647c54.data_sdk.js" integrity="sha512-vkTX6CfvpHc3WbjK+tFJCaDuw4ERA4aEV/e5/7+MMJPMTF4RJYCI6CAwJBT/gtDW+dba4uLSsPUgDjVDHWtgUQ=="></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#07112b; --cyan:#60dfff; --yellow:#f8ef56; --line:rgba(115,190,255,.24); }
+    * { box-sizing:border-box; }
+    body { margin:0; color:#eaf7ff; font-family:"DM Sans",sans-serif; overflow-x:hidden; }
+    .app-shell { width:100%; min-height:calc(100 * min(var(--vh, 1vh), 1vh)); background:#07112b; }
+    .lab-grid { background-image:linear-gradient(rgba(97,212,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(97,212,255,.055) 1px,transparent 1px); background-size:34px 34px; }
+    .orb { position:fixed; border-radius:999px; filter:blur(80px); opacity:.28; pointer-events:none; }
+    .orb-a { width:360px; height:360px; background:#164ccc; top:-120px; left:-100px; }
+    .orb-b { width:340px; height:340px; background:#7438cd; right:-110px; top:31%; }
+    .lab-card { background:linear-gradient(145deg,rgba(21,42,91,.95),rgba(8,20,53,.97)); border:1px solid var(--line); box-shadow:0 18px 50px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.05); }
+    .neon-border { position:relative; }
+    .neon-border::before { content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px; background:linear-gradient(120deg,rgba(96,223,255,.78),rgba(167,139,250,.05),rgba(248,239,86,.55)); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+    .view { display:none; animation:reveal .35s ease both; }
+    .view.active { display:block; }
+    @keyframes reveal { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .page-title,.mini-kicker { font-family:"Space Mono",monospace; }
+    .mini-kicker { color:var(--cyan); letter-spacing:.12em; font-size:.73rem; }
+    .topic-card,.main-btn { transition:transform .2s ease,filter .2s ease,border-color .2s ease; }
+    .topic-card:hover,.main-btn:hover { transform:translateY(-4px); filter:brightness(1.12); }
+    .topic-card:hover { border-color:rgba(248,239,86,.72); }
+    button:focus-visible,input:focus-visible { outline:3px solid var(--yellow); outline-offset:3px; }
+    .part-btn.selected { background:#f8ef56; color:#07112b; border-color:#fffbd0; box-shadow:0 0 18px rgba(248,239,86,.36); }
+    .wire-path { stroke:#355d88; stroke-width:8; stroke-linecap:round; transition:.3s ease; }
+    .wire-path.connected { stroke:#f8ef56; filter:drop-shadow(0 0 5px #f8ef56); }
+    .bulb-glass { fill:#355277; transition:.3s ease; }
+    .bulb-glass.lit { fill:#fffbd0; filter:drop-shadow(0 0 13px #f8ef56); }
+    .magnet { transition:transform .45s cubic-bezier(.2,.85,.25,1); }
+    .field-line { fill:none; stroke:#66dcff; stroke-width:2; opacity:.58; }
+    .answer.correct { border-color:#74f7bf; background:rgba(116,247,191,.15); }
+    .answer.wrong { border-color:#ff7c95; background:rgba(255,124,149,.14); }
+    .toast { transform:translateY(130%); opacity:0; transition:.35s ease; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .quiz-answer { transition:.18s ease; }
+    .quiz-answer:hover:not(:disabled) { transform:translateY(-2px); filter:brightness(1.15); border-color:rgba(96,223,255,.65); }
+    .quiz-answer:disabled { cursor:default; }
+    .answer-correct { border-color:#74f7bf !important; background:rgba(116,247,191,.16) !important; }
+    .answer-wrong { border-color:#ff7c95 !important; background:rgba(255,101,117,.16) !important; }
+    .static-part { user-select:none; -webkit-user-select:none; cursor:pointer; }
+    .static-part:hover { filter:brightness(1.18); }
+    .quiz-option { border:1px solid rgba(120,150,180,.35); background:rgba(255,255,255,.05); border-radius:12px; padding:15px 12px; cursor:pointer; transition:.15s; color:inherit; font:inherit; text-align:left; }
+    .quiz-option:hover { transform:translateY(-2px); border-color:rgba(100,180,255,.75); background:rgba(255,255,255,.08); }
+    .quiz-option.correct { border-color:#36d27c; background:rgba(54,210,124,.15); }
+    .quiz-option.wrong { border-color:#ff6575; background:rgba(255,101,117,.12); }
+    .quiz-option:disabled { cursor:default; opacity:.95; }
+    .quiz-explanation { margin-top:15px; padding:13px 15px; border-radius:10px; background:rgba(255,255,255,.055); line-height:1.6; font-size:.95rem; }
+    .quiz-next { margin-top:15px; border:0; border-radius:10px; padding:12px 20px; cursor:pointer; font-weight:700; font-size:.95rem; background:#f8ef56; color:#07112b; }
+    .quiz-result { padding:35px 8px; text-align:center; font-weight:700; line-height:2; font-size:1.1rem; }
+    .quiz-reset-note { margin-top:18px; opacity:.55; font-size:.8rem; text-align:center; }
+    @media(max-width:600px){ .random-options { grid-template-columns:1fr !important; } }
+  </style>
+  <script src="/_sdk/fcb6dc01f91829ac.resizing_sdk.js" type="text/javascript" integrity="sha512-YK8JfnN705qaEaVhiL7pcVB2Rs/BbdX5yxV55Az8zT/1JanyEWTw9HqCF915m9iV1YEaoil8qsjJz03l1Kb0Ug=="></script>
+ </head>
+ <body data-template-id="__page-root">
+  <div class="app-shell lab-grid">
+   <div class="orb orb-a"></div>
+   <div class="orb orb-b"></div>
+   <header class="relative z-10 w-full border-b border-sky-300/15 bg-[#07112b]/85 backdrop-blur-xl">
+    <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+     <button type="button" onclick="showView('home')" class="text-left"> <span data-template-id="site-logo" class="canva-text block font-bold tracking-[.12em]"></span> <span data-template-id="site-tagline" class="canva-text block mt-1 text-sky-200/70"></span> </button>
+     <div class="lab-card rounded-2xl px-4 py-2.5 flex items-center gap-3 min-w-[180px]">
+      <div class="w-9 h-9 rounded-xl bg-yellow-300 text-[#07112b] grid place-items-center"><i data-lucide="zap" class="w-5 h-5"></i>
+      </div>
+      <div>
+       <p data-template-id="progress-label" class="canva-text text-sky-100/65"></p>
+       <p id="hud-exp" class="font-bold text-yellow-100">0 EXP</p>
+      </div>
+     </div>
+    </div>
+   </header>
+   <main class="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-16">
+    <section id="home" class="view active" aria-labelledby="home-title">
+     <div data-template-id="home-banner" class="canva-banner lab-card neon-border rounded-[2rem] p-7 sm:p-10 mb-6">
+      <p data-template-id="home-kicker" class="canva-text mini-kicker mb-4"></p>
+      <h1 id="home-title" data-template-id="home-title" class="canva-text page-title font-bold leading-none"></h1>
+      <p data-template-id="home-description" class="canva-text text-sky-100/80 mt-5 max-w-2xl leading-relaxed"></p>
+     </div>
+     <div class="grid md:grid-cols-3 gap-5">
+      <button type="button" onclick="showView('generation')" data-template-id="generation-topic-card" class="canva-card topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+       <div class="w-14 h-14 rounded-2xl bg-cyan-300/15 text-cyan-200 grid place-items-center"><i data-lucide="zap" class="w-7 h-7"></i>
+       </div>
+       <div>
+        <p data-template-id="generation-topic-number" class="canva-text mini-kicker"></p>
+        <h2 data-template-id="generation-topic-title" class="canva-text font-bold mt-2"></h2>
+        <p data-template-id="generation-topic-description" class="canva-text text-sky-100/70 mt-3"></p>
+       </div><span data-template-id="generation-topic-action" class="canva-text text-yellow-200 font-bold mt-5"></span> </button> <button type="button" onclick="showView('energy')" data-template-id="energy-topic-card" class="canva-card topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+       <div class="w-14 h-14 rounded-2xl bg-yellow-300/15 text-yellow-200 grid place-items-center"><i data-lucide="circuit-board" class="w-7 h-7"></i>
+       </div>
+       <div>
+        <p data-template-id="energy-topic-number" class="canva-text mini-kicker"></p>
+        <h2 data-template-id="energy-topic-title" class="canva-text font-bold mt-2"></h2>
+        <p data-template-id="energy-topic-description" class="canva-text text-sky-100/70 mt-3"></p>
+       </div><span data-template-id="energy-topic-action" class="canva-text text-yellow-200 font-bold mt-5"></span> </button> <button type="button" onclick="showView('magnet')" data-template-id="magnet-topic-card" class="canva-card topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+       <div class="w-14 h-14 rounded-2xl bg-violet-300/15 text-violet-200 grid place-items-center"><i data-lucide="magnet" class="w-7 h-7"></i>
+       </div>
+       <div>
+        <p data-template-id="magnet-topic-number" class="canva-text mini-kicker"></p>
+        <h2 data-template-id="magnet-topic-title" class="canva-text font-bold mt-2"></h2>
+        <p data-template-id="magnet-topic-description" class="canva-text text-sky-100/70 mt-3"></p>
+       </div><span data-template-id="magnet-topic-action" class="canva-text text-yellow-200 font-bold mt-5"></span> </button>
+     </div>
+    </section>
+    <section id="generation" class="view" aria-labelledby="generation-title">
+     <button data-template-id="generation-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="generation-back-label" class="canva-text"></span> </button>
+     <div data-template-id="static-lab-panel" class="canva-panel lab-card neon-border rounded-2xl p-6 mt-5">
+      <p data-template-id="static-lab-kicker" class="canva-text mini-kicker"></p>
+      <h1 id="generation-title" data-template-id="generation-title" class="canva-text page-title font-bold mt-2"></h1>
+      <p data-template-id="static-lab-help" class="canva-text text-sky-100/70 mt-2"></p>
+      <div class="relative mt-6 min-h-[330px] rounded-2xl border border-cyan-300/20 bg-slate-950/35 overflow-hidden" id="static-stage">
+       <div id="fur-target" class="absolute left-[8%] bottom-8 w-32 h-24 rounded-xl bg-amber-800/80 border-2 border-amber-300/50 grid place-items-center text-center">
+        <div><i data-lucide="brush" class="text-amber-100"></i><span data-template-id="fur-label" class="canva-text block mt-1"></span>
+        </div>
+       </div><button id="straw-tool" type="button" onclick="runStaticExperiment()" class="static-part canva-button absolute left-[40%] top-12 rounded-xl border border-cyan-200/30 bg-cyan-300/15 px-5 py-4 text-left"> <i data-lucide="wand-2" class="text-cyan-200"></i><span data-template-id="straw-label" class="canva-text block mt-2"></span> </button>
+       <div id="balloon-tool" class="absolute right-[9%] bottom-12 rounded-full border border-violet-200/40 bg-violet-400/20 px-5 py-6 text-center">
+        <i data-lucide="circle" class="text-violet-200"></i><span data-template-id="balloon-label" class="canva-text block mt-2"></span>
+       </div>
+      </div>
+      <div class="mt-5 rounded-2xl border border-cyan-300/20 bg-slate-950/30 p-5">
+       <p data-template-id="static-drop-label" class="canva-text text-sky-100/75"></p>
+       <p id="static-status" class="mt-3 text-yellow-100 font-bold" aria-live="polite"></p>
+      </div>
+     </div>
+    </section>
+    <section id="energy" class="view" aria-labelledby="energy-title">
+     <button data-template-id="energy-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="energy-back-label" class="canva-text"></span> </button>
+     <div class="mt-6 mb-7">
+      <p data-template-id="energy-kicker" class="canva-text mini-kicker"></p>
+      <h1 id="energy-title" data-template-id="energy-title" class="canva-text page-title font-bold mt-2"></h1>
+      <p data-template-id="energy-description" class="canva-text text-sky-100/70 mt-3"></p>
+     </div>
+     <div class="grid lg:grid-cols-[.78fr_1.22fr] gap-6">
+      <aside data-template-id="lab-control-panel" class="canva-panel lab-card rounded-2xl p-5">
+       <h2 data-template-id="lab-parts-title" class="canva-text font-bold"></h2>
+       <p data-template-id="lab-parts-help" class="canva-text text-sky-100/65 mt-2"></p>
+       <div class="grid grid-cols-2 gap-3 mt-5">
+        <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="battery" onclick="togglePart(this)"><i data-lucide="battery-charging" class="text-yellow-200"></i><span data-template-id="battery-label" class="canva-text block mt-2"></span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="bulb" onclick="togglePart(this)"><i data-lucide="lightbulb" class="text-yellow-200"></i><span data-template-id="bulb-label" class="canva-text block mt-2"></span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="switch" onclick="togglePart(this)"><i data-lucide="toggle-right" class="text-cyan-200"></i><span data-template-id="switch-label" class="canva-text block mt-2"></span></button> <button type="button" class="part-btn rounded-xl border border-sky-300/20 bg-slate-950/30 p-4 text-left" data-part="wire" onclick="togglePart(this)"><i data-lucide="cable" class="text-violet-200"></i><span data-template-id="wire-label" class="canva-text block mt-2"></span></button>
+       </div><button data-template-id="check-circuit-button" type="button" onclick="checkCircuit()" class="canva-button main-btn w-full mt-5 rounded-xl py-3"></button>
+       <p id="lab-feedback" class="mt-4 rounded-xl border border-sky-300/15 bg-slate-950/35 p-4 text-sm text-sky-100/80" aria-live="polite"></p>
+      </aside>
+      <div data-template-id="circuit-board-panel" class="canva-panel lab-card rounded-2xl p-5 sm:p-8 min-h-[350px] flex flex-col">
+       <p data-template-id="circuit-board-label" class="canva-text mini-kicker"></p>
+       <p id="circuit-status" class="font-bold text-sky-200 mt-2" aria-live="polite">전류 대기 중</p>
+       <div class="flex-1 grid place-items-center">
+        <svg viewbox="0 0 620 310" class="w-full max-w-2xl" role="img" aria-label="전기 회로 실험 보드">
+         <path class="wire-path" d="M120 78 H250 M370 78 H500 V230"></path> <path class="wire-path" d="M500 230 H370 M250 230 H120 V78"></path> <rect x="72" y="117" width="96" height="75" rx="11" fill="#19375f" stroke="#a6e9ff" stroke-width="3"></rect> <text x="108" y="162" fill="#f8ef56" font-size="31" font-weight="bold">
+          + −
+         </text> <rect x="250" y="56" width="120" height="44" rx="13" fill="#17335c" stroke="#a6e9ff" stroke-width="3"></rect> <circle cx="278" cy="78" r="7" fill="#60dfff"></circle> <path d="M293 78 H338" stroke="#d9f7ff" stroke-width="5"></path> <circle cx="310" cy="230" r="58" fill="#10264f" stroke="#a6e9ff" stroke-width="4"></circle> <circle id="bulb-glass" class="bulb-glass" cx="310" cy="222" r="27"></circle> <path d="M291 258 H329 M296 267 H324" stroke="#a6e9ff" stroke-width="5"></path>
+        </svg>
+       </div>
+      </div>
+     </div>
+     <div class="mt-8 pt-6 border-t border-sky-300/15">
+      <div class="flex items-center justify-between gap-3">
+       <p data-template-id="random-quiz-title" class="canva-text mini-kicker"></p>
+       <p id="quiz-score" class="text-sm font-bold text-yellow-100">문제 0 / 3</p>
+      </div>
+      <div id="random-quiz-content" class="mt-4"></div>
+      <p data-template-id="random-quiz-note" class="canva-text text-sky-100/55 mt-4"></p>
+     </div>
+    </section>
+   </main>
+  </div>
+  <section id="magnet" class="view" aria-labelledby="magnet-title">
+   <button data-template-id="magnet-back-button" type="button" onclick="showView('home')" class="canva-button main-btn rounded-xl px-4 py-2 flex items-center gap-2"> <i data-lucide="arrow-left" class="w-4 h-4"></i><span data-template-id="magnet-back-label" class="canva-text"></span> </button>
+   <div class="mt-6 mb-7">
+    <p data-template-id="magnet-kicker" class="canva-text mini-kicker"></p>
+    <h1 id="magnet-title" data-template-id="magnet-title" class="canva-text page-title font-bold mt-2"></h1>
+    <p data-template-id="magnet-description" class="canva-text text-sky-100/70 mt-3"></p>
+   </div>
+   <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-6">
+    <div data-template-id="magnet-stage-panel" class="canva-panel lab-card rounded-2xl p-6">
+     <p data-template-id="magnet-stage-label" class="canva-text mini-kicker"></p>
+     <p id="magnet-result" class="font-bold text-yellow-100 mt-2" aria-live="polite">같은 극 → 서로 밀어냄</p>
+     <div class="relative h-64 mt-4 rounded-2xl bg-[#061331] overflow-hidden border border-sky-300/15">
+      <svg class="absolute inset-0 w-full h-full" viewbox="0 0 700 270" aria-hidden="true">
+       <path class="field-line" d="M170 135 C170 30 530 30 530 135"></path> <path class="field-line" d="M170 135 C170 240 530 240 530 135"></path> <path class="field-line" d="M190 135 C220 78 480 78 510 135"></path> <path class="field-line" d="M190 135 C220 192 480 192 510 135"></path>
+      </svg>
+      <div id="magnet-left" class="magnet absolute top-[92px] left-[21%] flex h-20 w-28 overflow-hidden rounded-xl border-2 border-white/40"><span class="w-1/2 bg-red-500 grid place-items-center font-bold">N</span><span class="w-1/2 bg-blue-500 grid place-items-center font-bold">S</span>
+      </div>
+      <div id="magnet-right" class="magnet absolute top-[92px] right-[21%] flex h-20 w-28 overflow-hidden rounded-xl border-2 border-white/40"><span id="right-pole" class="w-1/2 bg-red-500 grid place-items-center font-bold">N</span><span class="w-1/2 bg-blue-500 grid place-items-center font-bold">S</span>
+      </div>
+     </div><label for="magnet-distance" data-template-id="distance-label" class="canva-text block font-bold mt-5"></label> <input id="magnet-distance" type="range" min="0" max="100" value="50" class="w-full accent-yellow-300 mt-2" oninput="updateMagnet()">
+     <div class="grid sm:grid-cols-2 gap-3 mt-4">
+      <button data-template-id="same-pole-button" type="button" onclick="setPoles(true)" class="canva-button main-btn rounded-xl py-3"></button> <button data-template-id="different-pole-button" type="button" onclick="setPoles(false)" class="canva-button main-btn rounded-xl py-3"></button>
+     </div>
+    </div>
+    <aside data-template-id="magnet-question-panel" class="canva-panel lab-card rounded-2xl p-6">
+     <p data-template-id="magnet-question-kicker" class="canva-text mini-kicker"></p>
+     <h2 data-template-id="magnet-question-title" class="canva-text font-bold mt-2"></h2>
+     <div class="space-y-3 mt-5">
+      <button type="button" onclick="answerMagnet(false,this)" class="answer w-full text-left rounded-xl border border-sky-300/20 bg-slate-950/35 p-4"><span data-template-id="magnet-answer-attract" class="canva-text"></span></button> <button type="button" onclick="answerMagnet(true,this)" class="answer w-full text-left rounded-xl border border-sky-300/20 bg-slate-950/35 p-4"><span data-template-id="magnet-answer-repel" class="canva-text"></span></button>
+     </div>
+     <p id="magnet-feedback" class="mt-5 text-sm text-sky-100/75" aria-live="polite"></p>
+    </aside>
+   </div>
+  </section>
+  <div id="toast" class="toast fixed z-50 bottom-5 left-1/2 -translate-x-1/2 rounded-2xl border border-yellow-200/50 bg-[#132752] px-5 py-3 text-center font-bold text-yellow-100 shadow-2xl" aria-live="polite"></div>
+  <script src="/_sdk/20ec72cea0cb85e1.editing_sdk.js" integrity="sha512-y1Lf0yXrnk1vqzLs9a/3x3pp+jSvei2Pbl+x/omYgN5b7HqLzMgs5Vx9HdgcQfw7jcDinPHCzHGQ6BsPf/68zQ=="></script>
+  <script>
+    const defaultState = { total_exp:0, level:1, completed_concepts:0, completed_experiments:0, solved_questions:0, correct_answers:0, earned_badges:"", completed_puzzles:0, last_activity:"" };
+    let state = { ...defaultState };
+    let record = null;
+    let dataReady = false;
+    let labParts = new Set();
+    let magnetSame = true;
+    let magnetAnswered = false;
+    const rewards = new Set();
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function renderStats() {
+      document.getElementById("hud-exp").textContent = state.total_exp + " EXP";
+    }
+
+    async function saveChanges(changes) {
+      const total = changes.total_exp !== undefined ? changes.total_exp : state.total_exp;
+      const next = { ...state, ...changes, total_exp:total, level:Math.min(5, Math.floor(total / 200) + 1), last_activity:new Date().toISOString() };
+      state = next;
+      renderStats();
+      if (!dataReady) return;
+      const result = record ? await window.dataSdk.update({ ...record, ...next }) : await window.dataSdk.create(next);
+      if (!result.isOk) showToast("학습 기록을 저장하지 못했어요. 다시 시도해 주세요.");
+    }
+
+    function award(key, amount, changes, message) {
+      if (rewards.has(key)) return;
+      rewards.add(key);
+      saveChanges({ ...changes, total_exp:state.total_exp + amount });
+      showToast("+" + amount + " EXP · " + message);
+    }
+
+    const handler = {
+      onDataChanged(data) {
+        record = data[0] || null;
+        if (record) state = { ...defaultState, ...record };
+        renderStats();
+      }
+    };
+
+    async function initData() {
+      const result = await window.dataSdk.init(handler);
+      dataReady = result.isOk;
+      if (!result.isOk) showToast("학습 기록을 연결하지 못했어요.");
+    }
+
+    // 페이지를 이동할 때 호출됩니다. "generation"(전기의 발생) 페이지로 들어올 때마다
+    // 정전기 실험을 처음 상태로 초기화합니다.
+    function showView(id) {
+      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === id));
+      window.scrollTo({ top:0, behavior:"smooth" });
+      if (id === "generation") resetStaticLab();
+    }
+
+    // 정전기 실험(빨대·풍선) 상태를 처음 화면으로 되돌리는 함수.
+    // 실행 중이던 애니메이션 위치, 상태 문구, 재실행 가능 여부를 모두 초기값으로 리셋합니다.
+    function resetStaticLab() {
+      const straw = document.getElementById("straw-tool");
+      const balloon = document.getElementById("balloon-tool");
+      const status = document.getElementById("static-status");
+
+      // 다시 실험 버튼을 누를 수 있도록 실행 상태를 초기화
+      straw.dataset.running = "false";
+
+      // 애니메이션 없이 즉시 원래 위치(CSS 클래스 위치)로 되돌리기 위해
+      // transition을 잠깐 끈 뒤 인라인 스타일을 제거합니다.
+      straw.style.transition = "none";
+      straw.style.left = "";
+      straw.style.top = "";
+
+      balloon.style.transition = "none";
+      balloon.style.right = "";
+      balloon.style.bottom = "";
+
+      status.textContent = "";
+
+      // 다음 실험 실행 시에는 다시 부드러운 애니메이션이 보이도록 transition 복구
+      requestAnimationFrame(() => {
+        straw.style.transition = "";
+        balloon.style.transition = "";
+      });
+    }
+
+    async function runStaticExperiment() {
+      const straw = document.getElementById("straw-tool");
+      const balloon = document.getElementById("balloon-tool");
+      const status = document.getElementById("static-status");
+      if (straw.dataset.running === "true") return;
+      straw.dataset.running = "true";
+      status.textContent = "빨대를 털가죽에 비비는 중…";
+      straw.style.transition = "all .7s ease";
+      straw.style.left = "17%";
+      straw.style.top = "55%";
+      await new Promise(resolve => setTimeout(resolve, 800));
+      status.textContent = "찰찰찰… 털가죽에 문질러 전기가 생겼어요!";
+      straw.style.left = "56%";
+      straw.style.top = "48%";
+      await new Promise(resolve => setTimeout(resolve, 900));
+      balloon.style.transition = "all 1.6s ease";
+      balloon.style.right = "25%";
+      balloon.style.bottom = "30%";
+      status.textContent = "정전기 때문에 풍선이 빨대를 천천히 따라와요!";
+      award("static", 80, { completed_concepts:state.completed_concepts + 1 }, "정전기 실험 성공!");
+      straw.dataset.running = "false";
+    }
+
+    function togglePart(button) {
+      const part = button.dataset.part;
+      labParts.has(part) ? labParts.delete(part) : labParts.add(part);
+      button.classList.toggle("selected", labParts.has(part));
+    }
+
+    function checkCircuit() {
+      const complete = ["battery","bulb","switch","wire"].every(part => labParts.has(part));
+      const feedback = document.getElementById("lab-feedback");
+      if (!complete) {
+        feedback.textContent = "전지, 전구, 스위치, 전선을 모두 선택해 닫힌 회로를 만들어 보세요.";
+        return;
+      }
+      document.querySelectorAll(".wire-path").forEach(path => path.classList.add("connected"));
+      document.getElementById("bulb-glass").classList.add("lit");
+      document.getElementById("circuit-status").textContent = "전류가 흐르고 있어요! ⚡";
+      feedback.textContent = "실험 성공! 닫힌 회로가 만들어져 전구에 불이 켜졌습니다.";
+      award("circuit", 100, { completed_experiments:state.completed_experiments + 1 }, "가상 실험 성공!");
+    }
+
+    function setPoles(same) {
+      magnetSame = same;
+      const rightPole = document.getElementById("right-pole");
+      rightPole.textContent = same ? "N" : "S";
+      rightPole.className = "w-1/2 " + (same ? "bg-red-500" : "bg-blue-500") + " grid place-items-center font-bold";
+      updateMagnet();
+    }
+
+    function updateMagnet() {
+      const distance = Number(document.getElementById("magnet-distance").value);
+      const shift = (50 - distance) * .58;
+      document.getElementById("magnet-left").style.transform = "translateX(" + (-shift) + "px)";
+      document.getElementById("magnet-right").style.transform = "translateX(" + shift + "px)";
+      document.getElementById("magnet-result").textContent = magnetSame ? "같은 극 → 서로 밀어냄" : "다른 극 → 서로 끌어당김";
+    }
+
+    function answerMagnet(isRepel, button) {
+      if (magnetAnswered) return;
+      magnetAnswered = true;
+      const correct = isRepel;
+      document.querySelectorAll(".answer").forEach(item => item.disabled = true);
+      button.classList.add(correct ? "correct" : "wrong");
+      const feedback = document.getElementById("magnet-feedback");
+      if (correct) {
+        feedback.textContent = "정답! 같은 극끼리는 서로 밀어냅니다.";
+        award("magnet", 100, { completed_experiments:state.completed_experiments + 1, solved_questions:state.solved_questions + 1, correct_answers:state.correct_answers + 1 }, "자기장 실험 성공!");
+      } else {
+        feedback.textContent = "아쉬워요. 같은 극끼리는 서로 밀어냅니다.";
+        saveChanges({ solved_questions:state.solved_questions + 1 });
+      }
+    }
+
+    const randomQuizBank = [
+      ["전구에 불이 켜지려면 어떤 조건이 필요할까요?",["회로가 끊겨 있어야 한다","회로가 닫혀 있어야 한다","전선이 하나만 있어야 한다","스위치가 항상 열려 있어야 한다"],1,"전류가 흐르려면 전류가 지나가는 길이 완전히 연결된 닫힌 회로여야 합니다."],
+      ["전구 A와 B를 직렬로 연결했다. A의 필라멘트가 끊어지면 B는?",["더 밝아진다","그대로 켜진다","꺼진다","깜빡인다"],2,"직렬회로에서는 한 곳이 끊어지면 전체 회로가 끊어져 전류가 흐르지 않습니다."],
+      ["같은 시간 동안 40 W와 100 W 전기기구를 사용했다. 전기에너지를 더 많이 소비한 것은?",["40 W","100 W","둘 다 같다","전선에 따라 결정된다"],1,"같은 시간이라면 전력이 큰 기구가 더 많은 전기에너지를 소비합니다."],
+      ["스위치를 열었을 때 일어나는 일은?",["전류가 더 많이 흐른다","회로가 끊어져 전류가 흐르지 않는다","전압이 반드시 2배가 된다","전구 밝기가 반드시 2배가 된다"],1,"스위치를 열면 전류가 지나가는 길이 끊어집니다."],
+      ["60 W 전구를 10초 동안 사용했다. 소비한 전기에너지는?",["6 J","60 J","600 J","6000 J"],2,"E = Pt이므로 60 W × 10 s = 600 J입니다."],
+      ["다음 중 닫힌 회로에 대한 설명으로 옳은 것은?",["반드시 건전지가 2개 있어야 한다","전류가 흐를 수 있는 완전한 통로가 연결되어 있다","스위치가 반드시 열려 있다","전구가 반드시 2개 있어야 한다"],1,"닫힌 회로는 전류가 흐를 수 있도록 통로가 완전히 연결된 상태입니다."],
+      ["전구 2개를 직렬로 연결한 회로에서 전구 하나를 제거하면?",["다른 전구가 더 밝아진다","다른 전구도 꺼진다","아무 변화가 없다","건전지가 자동으로 하나 더 생긴다"],1,"전구 하나를 제거하면 직렬회로의 통로가 끊어집니다."],
+      ["200 W 전기기구를 5초 동안 사용했다. 소비한 전기에너지는?",["40 J","205 J","1000 J","2000 J"],2,"E = Pt = 200 W × 5 s = 1000 J입니다."],
+      ["다음 중 전류의 흐름을 막는 상황은?",["스위치를 닫는다","끊어진 전선을 연결한다","회로의 한 부분이 끊어져 있다","전지를 연결한다"],2,"회로가 한 부분이라도 끊어지면 전류가 흐를 수 있는 통로가 사라집니다."],
+      ["100 W와 50 W 기구를 각각 20초 사용했다. 소비한 전기에너지의 차이는?",["500 J","1000 J","1500 J","2000 J"],1,"(100−50) W × 20 s = 1000 J입니다."]
+    ];
+
+    let randomSelected = [];
+    let randomIndex = 0;
+    let randomScore = 0;
+
+    function setupRandomQuiz() {
+      const pool = [...randomQuizBank];
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      randomSelected = pool.slice(0, 3);
+      randomIndex = 0;
+      randomScore = 0;
+      renderRandomQuiz();
+    }
+
+    function renderRandomQuiz() {
+      const box = document.getElementById("random-quiz-content");
+      const scoreEl = document.getElementById("quiz-score");
+      const q = randomSelected[randomIndex];
+      if (!q) return;
+      scoreEl.textContent = "문제 " + (randomIndex + 1) + " / 3";
+      box.innerHTML = "<p class=\"quiz-question\">" + (randomIndex + 1) + ". " + q[0] + "</p><div class=\"random-options quiz-options\"></div>";
+      const options = box.querySelector(".random-options");
+      q[1].forEach((label, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "quiz-option";
+        button.textContent = String.fromCharCode(9312 + index) + " " + label;
+        button.addEventListener("click", () => answerRandomQuiz(index, button, q, options));
+        options.appendChild(button);
+      });
+    }
+
+    function answerRandomQuiz(choice, button, q, options) {
+      [...options.children].forEach(item => item.disabled = true);
+      const correct = choice === q[2];
+      if (correct) { randomScore++; button.classList.add("correct"); }
+      else { button.classList.add("wrong"); options.children[q[2]].classList.add("correct"); }
+      const explanation = document.createElement("div");
+      explanation.className = "quiz-explanation";
+      explanation.innerHTML = "<strong>" + (correct ? "정답! 🎉" : "오답! ❌") + "</strong><br>" + q[3];
+      const next = document.createElement("button");
+      next.type = "button";
+      next.className = "quiz-next";
+      next.textContent = randomIndex === 2 ? "결과 보기" : "다음 문제";
+      next.addEventListener("click", () => { randomIndex++; randomIndex < 3 ? renderRandomQuiz() : finishRandomQuiz(); });
+      document.getElementById("random-quiz-content").append(explanation, next);
+      document.getElementById("quiz-score").textContent = "문제 " + (randomIndex + 1) + " / 3 · 현재 점수 " + randomScore;
+    }
+
+    function finishRandomQuiz() {
+      const box = document.getElementById("random-quiz-content");
+      const message = randomScore === 3 ? "완벽해요! 🎉" : randomScore === 2 ? "좋아요! 조금만 더 복습해봐요 👍" : "괜찮아요! 해설을 다시 확인해보세요 💪";
+      box.innerHTML = "<div class=\"quiz-result\">" + message + "<br>최종 점수: " + randomScore + " / 3</div>";
+      document.getElementById("quiz-score").textContent = "완료 · " + randomScore + " / 3";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      renderStats();
+      updateMagnet();
+      setupRandomQuiz();
+      initData();
+    });
+  </script>
+ </body>
 </html>
