@@ -1105,238 +1105,359 @@
 
 
     /* =========================
-       자기 작용
-    ========================= */
+   자기 작용
+========================= */
 
-    let electromagnetOn=false;
+let electromagnetOn=false;
 
-    const compassPositions=[
-      [10,36],
-      [33,21],
-      [72,21],
-      [90,36],
-      [33,79],
-      [72,79],
-      [10,64],
-      [90,64],
-      [50,32],
-      [50,68]
-    ];
-
-
-    function compassFieldAngle(x,y){
-
-      const cx=50;
-      const cy=50;
-
-      const dx=x-cx;
-      const dy=y-cy;
-
-      return(
-        Math.atan2(dy,dx)*
-        180/
-        Math.PI+
-        90
-      );
-    }
+const compassPositions=[
+  [10,36],
+  [33,21],
+  [72,21],
+  [90,36],
+  [33,79],
+  [72,79],
+  [10,64],
+  [90,64],
+  [50,32],
+  [50,68]
+];
 
 
-    function renderCompasses(){
+/*
+ * 각 나침반에서 전자석 중심을 바라보는 방향 계산
+ *
+ * 나침반 기본 방향:
+ * 0deg   = 위
+ * 90deg  = 오른쪽
+ * 180deg = 아래
+ * -90deg = 왼쪽
+ */
+function compassAngleToMagnet(x,y){
 
-      const layer=
-        document.getElementById(
-          "compass-needles"
+  const targetX=50;
+  const targetY=50;
+
+  const dx=targetX-x;
+  const dy=targetY-y;
+
+  return(
+    Math.atan2(dx,-dy)*
+    180/
+    Math.PI
+  );
+}
+
+
+/*
+ * 나침반을 처음 한 번만 생성
+ */
+function createCompasses(){
+
+  const layer=
+    document.getElementById(
+      "compass-needles"
+    );
+
+  if(!layer)return;
+
+  if(
+    layer.children.length===
+    compassPositions.length
+  ){
+    return;
+  }
+
+  layer.innerHTML="";
+
+  compassPositions.forEach(
+    ([x,y],index)=>{
+
+      const holder=
+        document.createElement(
+          "div"
         );
 
-      if(!layer)return;
+      holder.className=
+        "compass-holder";
 
-      layer.innerHTML="";
+      holder.style.left=
+        x+"%";
+
+      holder.style.top=
+        y+"%";
 
 
-      compassPositions.forEach(
-        ([x,y])=>{
+      const body=
+        document.createElement(
+          "div"
+        );
 
-          const holder=
-            document.createElement(
-              "div"
+      body.className=
+        "compass-body";
+
+
+      const needle=
+        document.createElement(
+          "div"
+        );
+
+      needle.className=
+        "compass-needle";
+
+
+      const north=
+        document.createElement(
+          "div"
+        );
+
+      north.className=
+        "compass-north";
+
+
+      const south=
+        document.createElement(
+          "div"
+        );
+
+      south.className=
+        "compass-south";
+
+
+      needle.append(
+        north,
+        south
+      );
+
+      body.appendChild(
+        needle
+      );
+
+      holder.appendChild(
+        body
+      );
+
+
+      holder.dataset.index=
+        index;
+
+      holder.dataset.x=
+        x;
+
+      holder.dataset.y=
+        y;
+
+
+      layer.appendChild(
+        holder
+      );
+
+    }
+  );
+}
+
+
+/*
+ * 전자석 상태에 따라 나침반 방향 변경
+ */
+function updateCompassNeedles(){
+
+  const layer=
+    document.getElementById(
+      "compass-needles"
+    );
+
+  if(!layer)return;
+
+  createCompasses();
+
+
+  const holders=
+    layer.querySelectorAll(
+      ".compass-holder"
+    );
+
+
+  holders.forEach(
+    holder=>{
+
+      const index=
+        Number(
+          holder.dataset.index
+        );
+
+      const x=
+        Number(
+          holder.dataset.x
+        );
+
+      const y=
+        Number(
+          holder.dataset.y
+        );
+
+
+      const needle=
+        holder.querySelector(
+          ".compass-needle"
+        );
+
+      if(!needle)return;
+
+
+      /*
+       * 전자석 OFF:
+       * 모든 나침반이 위쪽
+       */
+      let angle=0;
+
+
+      if(electromagnetOn){
+
+        /*
+         * 바깥쪽 8개:
+         * 전자석 중심을 바라봄
+         */
+        if(index<8){
+
+          angle=
+            compassAngleToMagnet(
+              x,
+              y
             );
 
-          holder.style.cssText=
-            `position:absolute;
-             left:${x}%;
-             top:${y}%;
-             width:34px;
-             height:34px;
-             transform:translate(-50%,-50%);`;
-
-
-          const body=
-            document.createElement(
-              "div"
-            );
-
-          body.style.cssText=
-            `position:absolute;
-             inset:0;
-             border:2px solid rgba(234,247,255,.7);
-             border-radius:50%;
-             background:rgba(20,42,82,.92);`;
-
-
-          const needle=
-            document.createElement(
-              "div"
-            );
-
-          needle.style.cssText=
-            `position:absolute;
-             width:4px;
-             height:28px;
-             left:50%;
-             top:50%;
-             transform-origin:50% 50%;
-             transition:transform .4s ease;`;
-
-
-          let angle=0;
-
-          if(electromagnetOn){
-            angle=
-              compassFieldAngle(
-                x,
-                y
-              );
-          }
-
-
-          needle.style.transform=
-            `translate(-50%,-50%) rotate(${angle}deg)`;
-
-
-          const north=
-            document.createElement(
-              "div"
-            );
-
-          north.style.cssText=
-            `position:absolute;
-             top:0;
-             width:4px;
-             height:14px;
-             background:#ef4444;
-             border-radius:4px 4px 0 0;`;
-
-
-          const south=
-            document.createElement(
-              "div"
-            );
-
-          south.style.cssText=
-            `position:absolute;
-             bottom:0;
-             width:4px;
-             height:14px;
-             background:#3b82f6;
-             border-radius:0 0 4px 4px;`;
-
-
-          needle.append(
-            north,
-            south
-          );
-
-          body.appendChild(
-            needle
-          );
-
-          holder.appendChild(
-            body
-          );
-
-          layer.appendChild(
-            holder
-          );
         }
-      );
-    }
 
 
-    function updateElectromagnetUI(){
+        /*
+         * 가운데 위:
+         * 왼쪽을 바라봄
+         */
+        else if(index===8){
 
-      const btn=
-        document.getElementById(
-          "electromagnet-toggle"
-        );
+          angle=-90;
 
-      const stateEl=
-        document.getElementById(
-          "electromagnet-state"
-        );
-
-      const field=
-        document.getElementById(
-          "field-lines"
-        );
-
-      const graphic=
-        document.getElementById(
-          "electromagnet-graphic"
-        );
-
-      if(!btn||!stateEl)return;
+        }
 
 
-      btn.textContent=
-        electromagnetOn
-        ?"전자석 끄기"
-        :"전자석 켜기";
+        /*
+         * 가운데 아래:
+         * 오른쪽을 바라봄
+         */
+        else if(index===9){
 
+          angle=90;
 
-      btn.classList.toggle(
-        "bg-yellow-300",
-        electromagnetOn
-      );
+        }
 
-      btn.classList.toggle(
-        "text-[#07112b]",
-        electromagnetOn
-      );
-
-
-      stateEl.textContent=
-        electromagnetOn
-        ?"전자석 켜짐 · 나침반이 자기장 방향을 가리킴"
-        :"전자석 꺼짐 · 나침반은 위쪽을 가리킴";
-
-
-      if(field){
-        field.style.opacity=
-          electromagnetOn
-          ?".55"
-          :".12";
       }
 
 
-      if(graphic){
-        graphic.style.filter=
-          electromagnetOn
-          ?"drop-shadow(0 0 12px rgba(248,239,86,.35))"
-          :"none";
-      }
+      needle.style.transform=
+        "translate(-50%,-50%) rotate("+
+        angle+
+        "deg)";
 
-
-      renderCompasses();
     }
+  );
+}
 
 
-    function toggleElectromagnet(){
+/*
+ * 기존 코드에서 renderCompasses()를
+ * 호출해도 작동하도록 유지
+ */
+function renderCompasses(){
 
-      electromagnetOn=
-        !electromagnetOn;
+  createCompasses();
 
-      updateElectromagnetUI();
-    }
+  updateCompassNeedles();
+
+}
+
+
+function updateElectromagnetUI(){
+
+  const btn=
+    document.getElementById(
+      "electromagnet-toggle"
+    );
+
+  const stateEl=
+    document.getElementById(
+      "electromagnet-state"
+    );
+
+  const field=
+    document.getElementById(
+      "field-lines"
+    );
+
+  const graphic=
+    document.getElementById(
+      "electromagnet-graphic"
+    );
+
+
+  if(!btn||!stateEl)return;
+
+
+  btn.textContent=
+    electromagnetOn
+    ?"전자석 끄기"
+    :"전자석 켜기";
+
+
+  btn.classList.toggle(
+    "bg-yellow-300",
+    electromagnetOn
+  );
+
+  btn.classList.toggle(
+    "text-[#07112b]",
+    electromagnetOn
+  );
+
+
+  stateEl.textContent=
+    electromagnetOn
+    ?"전자석 켜짐 · 나침반이 자기장 방향을 가리킴"
+    :"전자석 꺼짐 · 나침반은 위쪽을 가리킴";
+
+
+  if(field){
+
+    field.style.opacity=
+      electromagnetOn
+      ?".55"
+      :".12";
+
+  }
+
+
+  if(graphic){
+
+    graphic.style.filter=
+      electromagnetOn
+      ?"drop-shadow(0 0 12px rgba(248,239,86,.35))"
+      :"none";
+
+  }
+
+
+  updateCompassNeedles();
+
+}
+
+
+function toggleElectromagnet(){
+
+  electromagnetOn=
+    !electromagnetOn;
+
+  updateElectromagnetUI();
+
+}
 
 
     /* =========================
