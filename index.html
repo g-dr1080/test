@@ -1,3493 +1,4848 @@
 <!doctype html>
 <html lang="ko">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ELECTRO LAB | 전기와 자기</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
-  <style>
-    :root { --ink:#07112b; --cyan:#60dfff; --yellow:#f8ef56; --line:rgba(115,190,255,.24); }
-    * { box-sizing:border-box; }
-    body { margin:0; color:#eaf7ff; font-family:"DM Sans",sans-serif; overflow-x:hidden; background:#07112b; }
-    .app-shell { width:100%; min-height:100vh; background:#07112b; }
-    .lab-grid { background-image:linear-gradient(rgba(97,212,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(97,212,255,.055) 1px,transparent 1px); background-size:34px 34px; }
-    .orb { position:fixed; border-radius:999px; filter:blur(80px); opacity:.28; pointer-events:none; }
-    .orb-a { width:360px; height:360px; background:#164ccc; top:-120px; left:-100px; }
-    .orb-b { width:340px; height:340px; background:#7438cd; right:-110px; top:31%; }
-    .lab-card { background:linear-gradient(145deg,rgba(21,42,91,.95),rgba(8,20,53,.97)); border:1px solid var(--line); box-shadow:0 18px 50px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.05); }
-    .neon-border { position:relative; }
-    .neon-border::before { content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px; background:linear-gradient(120deg,rgba(96,223,255,.78),rgba(167,139,250,.05),rgba(248,239,86,.55)); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
-    .view { display:none; width:100%; max-width:100%; min-width:0; animation:reveal .35s ease both; }
-    .view.active { display:block; }
-    @keyframes reveal { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-    .page-title,.mini-kicker { font-family:"Space Mono",monospace; }
-    .mini-kicker { color:var(--cyan); letter-spacing:.12em; font-size:.73rem; }
-    .topic-card,.main-btn { transition:transform .2s ease,filter .2s ease,border-color .2s ease; }
-    .topic-card:hover,.main-btn:hover { transform:translateY(-4px); filter:brightness(1.12); }
-    .topic-card:hover { border-color:rgba(248,239,86,.72); }
-    button:focus-visible,input:focus-visible { outline:3px solid var(--yellow); outline-offset:3px; }
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>ELECTRO LAB | 전기와 자기</title>
 
-    .quiz-option { border:1px solid rgba(120,150,180,.35); background:rgba(255,255,255,.05); border-radius:12px; padding:15px 12px; cursor:pointer; transition:.15s; color:inherit; font:inherit; text-align:left; }
-    .quiz-option:hover { transform:translateY(-2px); border-color:rgba(100,180,255,.75); background:rgba(255,255,255,.08); }
-    .quiz-option.correct { border-color:#36d27c; background:rgba(54,210,124,.15); }
-    .quiz-option.wrong { border-color:#ff6575; background:rgba(255,101,117,.12); }
-    .quiz-option:disabled { cursor:default; opacity:.95; }
-    .quiz-explanation { margin-top:15px; padding:13px 15px; border-radius:10px; background:rgba(255,255,255,.055); line-height:1.6; font-size:.95rem; }
-    .quiz-next { margin-top:15px; border:0; border-radius:10px; padding:12px 20px; cursor:pointer; font-weight:700; font-size:.95rem; background:#f8ef56; color:#07112b; }
-    .quiz-result { padding:35px 8px; text-align:center; font-weight:700; line-height:2; font-size:1.1rem; }
+ <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+ <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
 
-    .builder-piece { cursor:grab; user-select:none; -webkit-user-select:none; }
-    .circuit-dropzone { position:relative; min-height:390px; border:1px dashed rgba(96,223,255,.35); border-radius:18px; background:rgba(2,10,28,.45); overflow:hidden; }
-    .circuit-dropzone.dragover { border-color:#f8ef56; background:rgba(248,239,86,.06); }
-    .placed-piece { position:absolute; transform:translate(-50%,-50%); cursor:grab; z-index:3; }
-    .builder-hint { font-size:.85rem; color:rgba(234,247,255,.62); line-height:1.5; }
-    .circuit-wire-preview { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
-    .builder-status { min-height:24px; }
-    .circuit-result { display:none; margin-top:18px; padding:18px; border:1px solid rgba(96,223,255,.2); border-radius:18px; background:rgba(2,10,28,.45); }
-    .circuit-result.show { display:block; animation:reveal .35s ease both; }
-    .circuit-result svg { display:block; width:100%; height:auto; min-height:230px; }
-    .result-label { fill:#eaf7ff; font-size:15px; font-weight:700; text-anchor:middle; }
-    .result-note { color:rgba(234,247,255,.62); font-size:.82rem; margin-top:8px; }
-    .schematic-legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .schematic-chip { padding:6px 10px; border-radius:999px; border:1px solid rgba(120,150,180,.3); background:rgba(255,255,255,.04); font-size:.78rem; }
-    .result-terminal { fill:#f8ef56; }
-    .result-wire-plain { stroke:#eaf7ff; stroke-width:4; fill:none; stroke-linecap:round; stroke-linejoin:round; }
-    .result-symbol { stroke:#eaf7ff; fill:none; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
-    .result-bulb { stroke:#f8ef56; fill:none; stroke-width:4; }
+ <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-    .charge-object { overflow:hidden; }
-    .charge-particles { position:absolute; inset:8px; pointer-events:none; }
-    .charge-particle { position:absolute; width:20px; height:20px; border-radius:999px; display:grid; place-items:center; font-size:10px; font-weight:900; line-height:1; }
-    .charge-particle.minus { background:#60dfff; color:#07112b; border:2px solid #dffaff; box-shadow:0 0 9px rgba(96,223,255,.55); }
-    .charge-particle.plus { background:#ff7f96; color:#fff; border:2px solid #ffd6dd; box-shadow:0 0 9px rgba(255,127,150,.5); }
-    .charge-particle.moving { animation:chargeMove 1.15s ease-in-out infinite alternate; }
-    @keyframes chargeMove { from { transform:translateX(0); } to { transform:translateX(8px); } }
-    .charge-object-label { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:100%; text-align:center; text-shadow:0 1px 8px rgba(0,0,0,.6); pointer-events:none; }
-    .straw-object .charge-particle { width:16px; height:16px; font-size:8px; }
+ <style>
+  :root {
+   --ink:#07112b;
+   --cyan:#60dfff;
+   --yellow:#f8ef56;
+   --line:rgba(115,190,255,.24);
+  }
 
-    .exam-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;margin-top:20px}
-    .exam-panel{background:linear-gradient(145deg,rgba(21,42,91,.95),rgba(8,20,53,.97));border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.18)}
-    .exam-option{width:100%;text-align:left;border:1px solid rgba(120,150,180,.3);background:rgba(255,255,255,.04);color:inherit;border-radius:14px;padding:14px 16px;margin-top:10px;cursor:pointer;transition:.15s}
-    .exam-option:hover:not(:disabled){transform:translateY(-1px);border-color:rgba(96,223,255,.65);background:rgba(255,255,255,.07)}
-    .exam-option.selected{border-color:#74f7bf;background:rgba(116,247,191,.13);box-shadow:0 0 0 1px rgba(116,247,191,.15)}
-    .exam-option.correct{border-color:#74f7bf !important;background:rgba(116,247,191,.16) !important}
-    .exam-option.wrong{border-color:#ff7c95 !important;background:rgba(255,124,149,.14) !important}
-    .exam-option:disabled{cursor:default;opacity:.98}
-    .exam-nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-    .exam-btn{border:1px solid rgba(120,150,180,.3);background:rgba(255,255,255,.05);color:inherit;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
-    .exam-btn.primary{background:#f8ef56;color:#07112b;border-color:#fffbd0}
-    .exam-btn.danger{background:rgba(255,101,117,.12);border-color:rgba(255,101,117,.38)}
-    .exam-feedback{margin-top:14px;padding:14px;border-radius:12px;background:rgba(255,255,255,.05);line-height:1.6}
-    .exam-progress{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px}
-    .exam-progress>div{height:100%;width:0;background:#f8ef56;transition:width .25s ease}
-    .exam-index-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:14px}
-    .exam-index{border:1px solid rgba(120,150,180,.26);background:rgba(255,255,255,.035);color:inherit;border-radius:9px;padding:8px 0;cursor:pointer;font-weight:700;font-size:.82rem}
-    .exam-index.current{border-color:#f8ef56;background:rgba(248,239,86,.1)}
-    .exam-index.unanswered{color:rgba(234,247,255,.55)}
-    .exam-index.correct{border-color:#74f7bf;background:rgba(116,247,191,.14);color:#caffdf}
-    .exam-index.wrong{border-color:#ff7c95;background:rgba(255,124,149,.12);color:#ffd9df}
-    .exam-result{margin-top:14px;padding:18px;border:1px solid rgba(116,247,191,.25);background:rgba(116,247,191,.07);border-radius:14px}
-    @media(max-width:900px){.exam-grid{grid-template-columns:1fr}}
-    @media(max-width:600px){.random-options{grid-template-columns:1fr!important}}
+  * { box-sizing:border-box; }
 
-    /* 토스트 */
-    .toast{opacity:0;visibility:hidden;transform:translate(-50%,10px);transition:opacity .25s ease,transform .25s ease;}
-    .toast.show{opacity:1;visibility:visible;transform:translate(-50%,0);}
+  body {
+   margin:0;
+   color:#eaf7ff;
+   font-family:"DM Sans",sans-serif;
+   overflow-x:hidden;
+   background:#07112b;
+  }
 
-    /* 시험 초기화 확인 모달 (confirm() 대체) */
-    .exam-reset-overlay{position:fixed;inset:0;z-index:70;background:rgba(3,9,26,.68);display:none;align-items:center;justify-content:center;padding:20px;}
-    .exam-reset-overlay.show{display:flex;}
-    .exam-reset-box{background:linear-gradient(145deg,rgba(21,42,91,.98),rgba(8,20,53,.99));border:1px solid var(--line);border-radius:18px;padding:24px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.45);animation:reveal .25s ease both;}
-    .exam-reset-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
-  </style>
- </head>
+  .app-shell {
+   width:100%;
+   min-height:100vh;
+   background:#07112b;
+  }
 
- <body>
-  <div class="app-shell lab-grid">
-   <div class="orb orb-a"></div>
-   <div class="orb orb-b"></div>
+  .lab-grid {
+   background-image:
+    linear-gradient(rgba(97,212,255,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(97,212,255,.055) 1px,transparent 1px);
+   background-size:34px 34px;
+  }
 
-   <header class="relative z-10 w-full border-b border-sky-300/15 bg-[#07112b]/85 backdrop-blur-xl">
-    <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
-     <button type="button" onclick="showView('home')" class="text-left">
-      <span class="block font-bold tracking-[.12em]">ELECTRO LAB</span>
-      <span class="block mt-1 text-sky-200/70">전기와 자기 탐구실</span>
-     </button>
-     <div class="lab-card rounded-2xl px-4 py-2.5 flex items-center gap-3 min-w-[180px]">
-      <div class="w-9 h-9 rounded-xl bg-yellow-300 text-[#07112b] grid place-items-center"><i data-lucide="zap" class="w-5 h-5"></i></div>
-      <div>
-       <p class="text-sky-100/65">학습 진행도</p>
-       <p id="hud-exp" class="font-bold text-yellow-100">0 EXP</p>
-      </div>
-     </div>
+  .orb {
+   position:fixed;
+   border-radius:999px;
+   filter:blur(80px);
+   opacity:.28;
+   pointer-events:none;
+  }
+
+  .orb-a {
+   width:360px;
+   height:360px;
+   background:#164ccc;
+   top:-120px;
+   left:-100px;
+  }
+
+  .orb-b {
+   width:340px;
+   height:340px;
+   background:#7438cd;
+   right:-110px;
+   top:31%;
+  }
+
+  .lab-card {
+   background:linear-gradient(145deg,rgba(21,42,91,.95),rgba(8,20,53,.97));
+   border:1px solid var(--line);
+   box-shadow:
+    0 18px 50px rgba(0,0,0,.24),
+    inset 0 1px rgba(255,255,255,.05);
+  }
+
+  .neon-border {
+   position:relative;
+  }
+
+  .neon-border::before {
+   content:"";
+   position:absolute;
+   inset:-1px;
+   border-radius:inherit;
+   padding:1px;
+   background:
+    linear-gradient(
+     120deg,
+     rgba(96,223,255,.78),
+     rgba(167,139,250,.05),
+     rgba(248,239,86,.55)
+    );
+   -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+   -webkit-mask-composite:xor;
+   mask-composite:exclude;
+   pointer-events:none;
+  }
+
+  .view {
+   display:none;
+   width:100%;
+   max-width:100%;
+   min-width:0;
+   animation:reveal .35s ease both;
+  }
+
+  .view.active {
+   display:block;
+  }
+
+  @keyframes reveal {
+   from {
+    opacity:0;
+    transform:translateY(10px);
+   }
+
+   to {
+    opacity:1;
+    transform:translateY(0);
+   }
+  }
+
+  .page-title,
+  .mini-kicker {
+   font-family:"Space Mono",monospace;
+  }
+
+  .mini-kicker {
+   color:var(--cyan);
+   letter-spacing:.12em;
+   font-size:.73rem;
+  }
+
+  .topic-card,
+  .main-btn {
+   transition:
+    transform .2s ease,
+    filter .2s ease,
+    border-color .2s ease;
+  }
+
+  .topic-card:hover,
+  .main-btn:hover {
+   transform:translateY(-4px);
+   filter:brightness(1.12);
+  }
+
+  .topic-card:hover {
+   border-color:rgba(248,239,86,.72);
+  }
+
+  button:focus-visible,
+  input:focus-visible {
+   outline:3px solid var(--yellow);
+   outline-offset:3px;
+  }
+
+  .quiz-option {
+   border:1px solid rgba(120,150,180,.35);
+   background:rgba(255,255,255,.05);
+   border-radius:12px;
+   padding:15px 12px;
+   cursor:pointer;
+   transition:.15s;
+   color:inherit;
+   font:inherit;
+   text-align:left;
+  }
+
+  .quiz-option:hover {
+   transform:translateY(-2px);
+   border-color:rgba(100,180,255,.75);
+   background:rgba(255,255,255,.08);
+  }
+
+  .quiz-option.correct {
+   border-color:#36d27c;
+   background:rgba(54,210,124,.15);
+  }
+
+  .quiz-option.wrong {
+   border-color:#ff6575;
+   background:rgba(255,101,117,.12);
+  }
+
+  .quiz-option:disabled {
+   cursor:default;
+   opacity:.95;
+  }
+
+  .quiz-explanation {
+   margin-top:15px;
+   padding:13px 15px;
+   border-radius:10px;
+   background:rgba(255,255,255,.055);
+   line-height:1.6;
+   font-size:.95rem;
+  }
+
+  .quiz-next {
+   margin-top:15px;
+   border:0;
+   border-radius:10px;
+   padding:12px 20px;
+   cursor:pointer;
+   font-weight:700;
+   font-size:.95rem;
+   background:#f8ef56;
+   color:#07112b;
+  }
+
+  .quiz-result {
+   padding:35px 8px;
+   text-align:center;
+   font-weight:700;
+   line-height:2;
+   font-size:1.1rem;
+  }
+
+  .builder-piece {
+   cursor:grab;
+   user-select:none;
+   -webkit-user-select:none;
+  }
+
+  .circuit-dropzone {
+   position:relative;
+   min-height:390px;
+   border:1px dashed rgba(96,223,255,.35);
+   border-radius:18px;
+   background:rgba(2,10,28,.45);
+   overflow:hidden;
+  }
+
+  .circuit-dropzone.dragover {
+   border-color:#f8ef56;
+   background:rgba(248,239,86,.06);
+  }
+
+  .placed-piece {
+   position:absolute;
+   transform:translate(-50%,-50%);
+   cursor:grab;
+   z-index:3;
+  }
+
+  .builder-hint {
+   font-size:.85rem;
+   color:rgba(234,247,255,.62);
+   line-height:1.5;
+  }
+
+  .circuit-wire-preview {
+   position:absolute;
+   inset:0;
+   width:100%;
+   height:100%;
+   pointer-events:none;
+   z-index:1;
+  }
+
+  .builder-status {
+   min-height:24px;
+  }
+
+  .circuit-result {
+   display:none;
+   margin-top:18px;
+   padding:18px;
+   border:1px solid rgba(96,223,255,.2);
+   border-radius:18px;
+   background:rgba(2,10,28,.45);
+  }
+
+  .circuit-result.show {
+   display:block;
+   animation:reveal .35s ease both;
+  }
+
+  .circuit-result svg {
+   display:block;
+   width:100%;
+   height:auto;
+   min-height:230px;
+  }
+
+  .result-label {
+   fill:#eaf7ff;
+   font-size:15px;
+   font-weight:700;
+   text-anchor:middle;
+  }
+
+  .result-note {
+   color:rgba(234,247,255,.62);
+   font-size:.82rem;
+   margin-top:8px;
+  }
+
+  .schematic-legend {
+   display:flex;
+   flex-wrap:wrap;
+   gap:8px;
+   margin-top:10px;
+  }
+
+  .schematic-chip {
+   padding:6px 10px;
+   border-radius:999px;
+   border:1px solid rgba(120,150,180,.3);
+   background:rgba(255,255,255,.04);
+   font-size:.78rem;
+  }
+
+  .result-terminal {
+   fill:#f8ef56;
+  }
+
+  .result-wire-plain {
+   stroke:#eaf7ff;
+   stroke-width:4;
+   fill:none;
+   stroke-linecap:round;
+   stroke-linejoin:round;
+  }
+
+  .result-symbol {
+   stroke:#eaf7ff;
+   fill:none;
+   stroke-width:4;
+   stroke-linecap:round;
+   stroke-linejoin:round;
+  }
+
+  .result-bulb {
+   stroke:#f8ef56;
+   fill:none;
+   stroke-width:4;
+  }
+
+  .charge-object {
+   overflow:hidden;
+  }
+
+  .charge-particles {
+   position:absolute;
+   inset:8px;
+   pointer-events:none;
+  }
+
+  .charge-particle {
+   position:absolute;
+   width:20px;
+   height:20px;
+   border-radius:999px;
+   display:grid;
+   place-items:center;
+   font-size:10px;
+   font-weight:900;
+   line-height:1;
+  }
+
+  .charge-particle.minus {
+   background:#60dfff;
+   color:#07112b;
+   border:2px solid #dffaff;
+   box-shadow:0 0 9px rgba(96,223,255,.55);
+  }
+
+  .charge-particle.plus {
+   background:#ff7f96;
+   color:#fff;
+   border:2px solid #ffd6dd;
+   box-shadow:0 0 9px rgba(255,127,150,.5);
+  }
+
+  .charge-particle.moving {
+   animation:chargeMove 1.15s ease-in-out infinite alternate;
+  }
+
+  @keyframes chargeMove {
+   from { transform:translateX(0); }
+   to { transform:translateX(8px); }
+  }
+
+  .charge-object-label {
+   position:absolute;
+   left:50%;
+   top:50%;
+   transform:translate(-50%,-50%);
+   width:100%;
+   text-align:center;
+   text-shadow:0 1px 8px rgba(0,0,0,.6);
+   pointer-events:none;
+  }
+
+  .straw-object .charge-particle {
+   width:16px;
+   height:16px;
+   font-size:8px;
+  }
+
+  .exam-grid {
+   display:grid;
+   grid-template-columns:1.1fr .9fr;
+   gap:20px;
+   margin-top:20px;
+  }
+
+  .exam-panel {
+   background:linear-gradient(145deg,rgba(21,42,91,.95),rgba(8,20,53,.97));
+   border:1px solid var(--line);
+   border-radius:18px;
+   padding:22px;
+   box-shadow:0 18px 50px rgba(0,0,0,.18);
+  }
+
+  .exam-option {
+   width:100%;
+   text-align:left;
+   border:1px solid rgba(120,150,180,.3);
+   background:rgba(255,255,255,.04);
+   color:inherit;
+   border-radius:14px;
+   padding:14px 16px;
+   margin-top:10px;
+   cursor:pointer;
+   transition:.15s;
+  }
+
+  .exam-option:hover:not(:disabled) {
+   transform:translateY(-1px);
+   border-color:rgba(96,223,255,.65);
+   background:rgba(255,255,255,.07);
+  }
+
+  .exam-option.selected {
+   border-color:#74f7bf;
+   background:rgba(116,247,191,.13);
+   box-shadow:0 0 0 1px rgba(116,247,191,.15);
+  }
+
+  .exam-option.correct {
+   border-color:#74f7bf !important;
+   background:rgba(116,247,191,.16) !important;
+  }
+
+  .exam-option.wrong {
+   border-color:#ff7c95 !important;
+   background:rgba(255,124,149,.14) !important;
+  }
+
+  .exam-option:disabled {
+   cursor:default;
+   opacity:.98;
+  }
+
+  .exam-nav {
+   display:flex;
+   gap:10px;
+   flex-wrap:wrap;
+   margin-top:18px;
+  }
+
+  .exam-btn {
+   border:1px solid rgba(120,150,180,.3);
+   background:rgba(255,255,255,.05);
+   color:inherit;
+   border-radius:12px;
+   padding:10px 14px;
+   font-weight:700;
+   cursor:pointer;
+  }
+
+  .exam-btn.primary {
+   background:#f8ef56;
+   color:#07112b;
+   border-color:#fffbd0;
+  }
+
+  .exam-btn.danger {
+   background:rgba(255,101,117,.12);
+   border-color:rgba(255,101,117,.38);
+  }
+
+  .exam-feedback {
+   margin-top:14px;
+   padding:14px;
+   border-radius:12px;
+   background:rgba(255,255,255,.05);
+   line-height:1.6;
+  }
+
+  .exam-progress {
+   height:10px;
+   border-radius:999px;
+   background:rgba(255,255,255,.08);
+   overflow:hidden;
+   margin-top:10px;
+  }
+
+  .exam-progress>div {
+   height:100%;
+   width:0;
+   background:#f8ef56;
+   transition:width .25s ease;
+  }
+
+  .exam-index-grid {
+   display:grid;
+   grid-template-columns:repeat(5,minmax(0,1fr));
+   gap:7px;
+   margin-top:14px;
+  }
+
+  .exam-index {
+   border:1px solid rgba(120,150,180,.26);
+   background:rgba(255,255,255,.035);
+   color:inherit;
+   border-radius:9px;
+   padding:8px 0;
+   cursor:pointer;
+   font-weight:700;
+   font-size:.82rem;
+  }
+
+  .exam-index.current {
+   border-color:#f8ef56;
+   background:rgba(248,239,86,.1);
+  }
+
+  .exam-index.unanswered {
+   color:rgba(234,247,255,.55);
+  }
+
+  .exam-index.correct {
+   border-color:#74f7bf;
+   background:rgba(116,247,191,.14);
+   color:#caffdf;
+  }
+
+  .exam-index.wrong {
+   border-color:#ff7c95;
+   background:rgba(255,124,149,.12);
+   color:#ffd9df;
+  }
+
+  .exam-result {
+   margin-top:14px;
+   padding:18px;
+   border:1px solid rgba(116,247,191,.25);
+   background:rgba(116,247,191,.07);
+   border-radius:14px;
+  }
+
+  @media(max-width:900px) {
+   .exam-grid {
+    grid-template-columns:1fr;
+   }
+  }
+
+  @media(max-width:600px) {
+   .random-options {
+    grid-template-columns:1fr!important;
+   }
+  }
+
+  .toast {
+   opacity:0;
+   visibility:hidden;
+   transform:translate(-50%,10px);
+   transition:
+    opacity .25s ease,
+    transform .25s ease;
+  }
+
+  .toast.show {
+   opacity:1;
+   visibility:visible;
+   transform:translate(-50%,0);
+  }
+
+  .exam-reset-overlay {
+   position:fixed;
+   inset:0;
+   z-index:70;
+   background:rgba(3,9,26,.68);
+   display:none;
+   align-items:center;
+   justify-content:center;
+   padding:20px;
+  }
+
+  .exam-reset-overlay.show {
+   display:flex;
+  }
+
+  .exam-reset-box {
+   background:linear-gradient(145deg,rgba(21,42,91,.98),rgba(8,20,53,.99));
+   border:1px solid var(--line);
+   border-radius:18px;
+   padding:24px;
+   max-width:380px;
+   width:100%;
+   box-shadow:0 20px 60px rgba(0,0,0,.45);
+   animation:reveal .25s ease both;
+  }
+
+  .exam-reset-actions {
+   display:flex;
+   gap:10px;
+   margin-top:20px;
+   justify-content:flex-end;
+  }
+
+  /* =========================
+     나침반
+  ========================= */
+
+  .compass-holder {
+   position:absolute;
+   width:34px;
+   height:34px;
+   transform:translate(-50%,-50%);
+  }
+
+  .compass-body {
+   position:absolute;
+   inset:0;
+   border:2px solid rgba(234,247,255,.7);
+   border-radius:50%;
+   background:rgba(20,42,82,.92);
+   box-shadow:
+    0 0 8px rgba(96,223,255,.12),
+    inset 0 0 8px rgba(255,255,255,.04);
+  }
+
+  .compass-needle {
+   position:absolute;
+   width:4px;
+   height:28px;
+   left:50%;
+   top:50%;
+   transform-origin:50% 50%;
+   transition:transform .65s cubic-bezier(.22,.61,.36,1);
+  }
+
+  .compass-north {
+   position:absolute;
+   left:0;
+   top:0;
+   width:4px;
+   height:14px;
+   background:#ef4444;
+   border-radius:4px 4px 0 0;
+   box-shadow:0 0 5px rgba(239,68,68,.35);
+  }
+
+  .compass-south {
+   position:absolute;
+   left:0;
+   bottom:0;
+   width:4px;
+   height:14px;
+   background:#3b82f6;
+   border-radius:0 0 4px 4px;
+   box-shadow:0 0 5px rgba(59,130,246,.3);
+  }
+
+  @media(max-width:600px) {
+   .compass-holder {
+    width:30px;
+    height:30px;
+   }
+
+   .compass-needle {
+    height:24px;
+   }
+
+   .compass-north,
+   .compass-south {
+    height:12px;
+   }
+  }
+ </style>
+</head>
+
+<body>
+
+<div class="app-shell lab-grid">
+
+ <div class="orb orb-a"></div>
+ <div class="orb orb-b"></div>
+
+ <header class="relative z-10 w-full border-b border-sky-300/15 bg-[#07112b]/85 backdrop-blur-xl">
+
+  <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+
+   <button type="button" onclick="showView('home')" class="text-left">
+    <span class="block font-bold tracking-[.12em]">ELECTRO LAB</span>
+    <span class="block mt-1 text-sky-200/70">전기와 자기 탐구실</span>
+   </button>
+
+   <div class="lab-card rounded-2xl px-4 py-2.5 flex items-center gap-3 min-w-[180px]">
+
+    <div class="w-9 h-9 rounded-xl bg-yellow-300 text-[#07112b] grid place-items-center">
+     <i data-lucide="zap" class="w-5 h-5"></i>
     </div>
-   </header>
 
-   <main class="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-16">
+    <div>
+     <p class="text-sky-100/65">학습 진행도</p>
+     <p id="hud-exp" class="font-bold text-yellow-100">0 EXP</p>
+    </div>
 
-    <!-- 홈 -->
-    <section id="home" class="view active">
-     <div class="lab-card neon-border rounded-[2rem] p-7 sm:p-10 mb-6">
-      <p class="mini-kicker mb-4">GRADE 8 SCIENCE · UNIT 07</p>
-      <h1 class="page-title font-bold leading-none">전기와 자기</h1>
-      <p class="text-sky-100/80 mt-5 max-w-2xl leading-relaxed">학습할 주제를 선택하고 실험과 퀴즈를 통해 전기와 자기의 원리를 직접 확인해 보세요.</p>
+   </div>
+
+  </div>
+
+ </header>
+
+
+ <main class="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-16">
+
+
+  <!-- 홈 -->
+  <section id="home" class="view active">
+
+   <div class="lab-card neon-border rounded-[2rem] p-7 sm:p-10 mb-6">
+
+    <p class="mini-kicker mb-4">GRADE 8 SCIENCE · UNIT 07</p>
+
+    <h1 class="page-title font-bold leading-none">
+     전기와 자기
+    </h1>
+
+    <p class="text-sky-100/80 mt-5 max-w-2xl leading-relaxed">
+     학습할 주제를 선택하고 실험과 퀴즈를 통해 전기와 자기의 원리를 직접 확인해 보세요.
+    </p>
+
+   </div>
+
+
+   <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+
+    <button type="button" onclick="showView('generation')" class="topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+
+     <div class="w-14 h-14 rounded-2xl bg-cyan-300/15 text-cyan-200 grid place-items-center">
+      <i data-lucide="zap" class="w-7 h-7"></i>
      </div>
 
-     <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
-
-      <button type="button" onclick="showView('generation')" class="topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
-       <div class="w-14 h-14 rounded-2xl bg-cyan-300/15 text-cyan-200 grid place-items-center"><i data-lucide="zap" class="w-7 h-7"></i></div>
-       <div><p class="mini-kicker">TOPIC 01</p><h2 class="font-bold mt-2">전기의 발생</h2><p class="text-sky-100/70 mt-3">전기가 만들어지는 원리를 알아볼 학습 공간입니다.</p></div>
-       <span class="text-yellow-200 font-bold mt-5">학습 공간 열기 →</span>
-      </button>
-
-      <button type="button" onclick="showView('energy')" class="topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
-       <div class="w-14 h-14 rounded-2xl bg-yellow-300/15 text-yellow-200 grid place-items-center"><i data-lucide="circuit-board" class="w-7 h-7"></i></div>
-       <div><p class="mini-kicker">TOPIC 02</p><h2 class="font-bold mt-2">전류와 전기 에너지</h2><p class="text-sky-100/70 mt-3">가상 실험실과 회로 퍼즐로 전류가 흐르는 길을 완성해 보세요.</p></div>
-       <span class="text-yellow-200 font-bold mt-5">실험 시작하기 →</span>
-      </button>
-
-      <button type="button" onclick="showView('magnet')" class="topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
-       <div class="w-14 h-14 rounded-2xl bg-violet-300/15 text-violet-200 grid place-items-center"><i data-lucide="magnet" class="w-7 h-7"></i></div>
-       <div><p class="mini-kicker">TOPIC 03</p><h2 class="font-bold mt-2">전류의 자기 작용</h2><p class="text-sky-100/70 mt-3">전자석과 나침반으로 전류가 만드는 자기장을 관찰해 보세요.</p></div>
-       <span class="text-yellow-200 font-bold mt-5">자기장 관찰하기 →</span>
-      </button>
-
-      <button type="button" onclick="showView('exam')" class="topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
-       <div class="w-14 h-14 rounded-2xl bg-rose-300/15 text-rose-200 grid place-items-center"><i data-lucide="clipboard-check" class="w-7 h-7"></i></div>
-       <div><p class="mini-kicker">FINAL TEST</p><h2 class="font-bold mt-2">전기 능력 평가</h2><p class="text-sky-100/70 mt-3">100문제 중 20문제를 풀어 학습 내용을 확인해 보세요.</p></div>
-       <span class="text-yellow-200 font-bold mt-5">시험 시작하기 →</span>
-      </button>
-
-     </div>
-    </section>
-
-
-    <!-- 시험 -->
-    <section id="exam" class="view">
-     <button type="button" onclick="showView('home')" class="main-btn rounded-xl px-4 py-2 flex items-center gap-2">
-      <i data-lucide="arrow-left" class="w-4 h-4"></i>← 홈으로 돌아가기
-     </button>
-
-     <div class="mt-6 mb-7">
-      <p class="mini-kicker">ELECTRIC ABILITY ASSESSMENT</p>
-      <h1 id="exam-title" class="page-title font-bold mt-2">전기 능력 평가</h1>
-      <p class="text-sky-100/70 mt-3 max-w-3xl">
-       총 100개의 문제 중 문제 초기화를 누를 때만 무작위로 20문제를 새로 뽑습니다.
-       다른 탭으로 이동했다가 돌아와도 현재 시험과 답안은 저장됩니다.
+     <div>
+      <p class="mini-kicker">TOPIC 01</p>
+      <h2 class="font-bold mt-2">전기의 발생</h2>
+      <p class="text-sky-100/70 mt-3">
+       전기가 만들어지는 원리를 알아볼 학습 공간입니다.
       </p>
      </div>
 
-     <div class="exam-grid">
+     <span class="text-yellow-200 font-bold mt-5">
+      학습 공간 열기 →
+     </span>
 
-      <div class="exam-panel">
-
-       <div class="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-         <p class="mini-kicker">QUESTION <span id="exam-qno">1</span> / 20</p>
-         <h2 id="exam-question" class="font-bold text-xl mt-1"></h2>
-        </div>
-        <div id="exam-score" class="text-sm font-bold text-yellow-100">아직 미채점</div>
-       </div>
-
-       <div class="exam-progress">
-        <div id="exam-progress-bar"></div>
-       </div>
-
-       <div id="exam-options" class="mt-4"></div>
-
-       <div id="exam-feedback" class="exam-feedback" style="display:none"></div>
-
-       <div class="exam-nav">
-        <button type="button" class="exam-btn" onclick="examPrev()">← 이전</button>
-        <button type="button" class="exam-btn primary" onclick="examNext()">다음 →</button>
-        <button type="button" class="exam-btn danger" onclick="resetExam()">문제 초기화</button>
-        <button type="button" class="exam-btn primary" onclick="gradeExam()">체점하기</button>
-       </div>
-
-       <div id="exam-finish" class="exam-result" style="display:none"></div>
-      </div>
+    </button>
 
 
-      <aside class="exam-panel">
-       <p class="mini-kicker">20문제 진행표</p>
-       <h2 class="font-bold text-xl mt-1">현재 시험 상태</h2>
-       <p class="builder-hint mt-2">
-        문제 번호를 누르면 바로 이동합니다.
-        답은 자동 저장됩니다.
+    <button type="button" onclick="showView('energy')" class="topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+
+     <div class="w-14 h-14 rounded-2xl bg-yellow-300/15 text-yellow-200 grid place-items-center">
+      <i data-lucide="circuit-board" class="w-7 h-7"></i>
+     </div>
+
+     <div>
+      <p class="mini-kicker">TOPIC 02</p>
+      <h2 class="font-bold mt-2">전류와 전기 에너지</h2>
+      <p class="text-sky-100/70 mt-3">
+       가상 실험실과 회로 퍼즐로 전류가 흐르는 길을 완성해 보세요.
+      </p>
+     </div>
+
+     <span class="text-yellow-200 font-bold mt-5">
+      실험 시작하기 →
+     </span>
+
+    </button>
+
+
+    <button type="button" onclick="showView('magnet')" class="topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+
+     <div class="w-14 h-14 rounded-2xl bg-violet-300/15 text-violet-200 grid place-items-center">
+      <i data-lucide="magnet" class="w-7 h-7"></i>
+     </div>
+
+     <div>
+      <p class="mini-kicker">TOPIC 03</p>
+      <h2 class="font-bold mt-2">전류의 자기 작용</h2>
+      <p class="text-sky-100/70 mt-3">
+       전자석과 나침반으로 전류가 만드는 자기장을 관찰해 보세요.
+      </p>
+     </div>
+
+     <span class="text-yellow-200 font-bold mt-5">
+      자기장 관찰하기 →
+     </span>
+
+    </button>
+
+
+    <button type="button" onclick="showView('exam')" class="topic-card lab-card rounded-3xl p-6 text-left min-h-[270px] flex flex-col justify-between">
+
+     <div class="w-14 h-14 rounded-2xl bg-rose-300/15 text-rose-200 grid place-items-center">
+      <i data-lucide="clipboard-check" class="w-7 h-7"></i>
+     </div>
+
+     <div>
+      <p class="mini-kicker">FINAL TEST</p>
+      <h2 class="font-bold mt-2">전기 능력 평가</h2>
+      <p class="text-sky-100/70 mt-3">
+       100문제 중 20문제를 풀어 학습 내용을 확인해 보세요.
+      </p>
+     </div>
+
+     <span class="text-yellow-200 font-bold mt-5">
+      시험 시작하기 →
+     </span>
+
+    </button>
+
+   </div>
+
+  </section>
+
+
+  <!-- 시험 -->
+  <section id="exam" class="view">
+
+   <button type="button" onclick="showView('home')" class="main-btn rounded-xl px-4 py-2 flex items-center gap-2">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    ← 홈으로 돌아가기
+   </button>
+
+
+   <div class="mt-6 mb-7">
+
+    <p class="mini-kicker">
+     ELECTRIC ABILITY ASSESSMENT
+    </p>
+
+    <h1 id="exam-title" class="page-title font-bold mt-2">
+     전기 능력 평가
+    </h1>
+
+    <p class="text-sky-100/70 mt-3 max-w-3xl">
+     총 100개의 문제 중 문제 초기화를 누를 때만 무작위로 20문제를 새로 뽑습니다.
+     다른 탭으로 이동했다가 돌아와도 현재 시험과 답안은 저장됩니다.
+    </p>
+
+   </div>
+
+
+   <div class="exam-grid">
+
+    <div class="exam-panel">
+
+     <div class="flex items-center justify-between gap-3 flex-wrap">
+
+      <div>
+
+       <p class="mini-kicker">
+        QUESTION <span id="exam-qno">1</span> / 20
        </p>
 
-       <div class="mt-3 text-xs text-sky-100/55">
-        <span class="text-green-300">● 정답</span>
-        <span class="ml-3 text-red-300">● 오답</span>
-        <span class="ml-3 text-sky-100/40">● 미응답</span>
-       </div>
-
-       <div id="exam-index-grid" class="exam-index-grid"></div>
-      </aside>
-
-     </div>
-    </section>
-
-
-    <!-- 전기의 발생 -->
-    <section id="generation" class="view">
-
-     <button type="button" onclick="showView('home')" class="main-btn rounded-xl px-4 py-2 flex items-center gap-2">
-      <i data-lucide="arrow-left" class="w-4 h-4"></i>← 홈으로 돌아가기
-     </button>
-
-     <div class="lab-card neon-border rounded-2xl p-6 mt-5">
-
-      <p class="mini-kicker">FRICTION ELECTRICITY LAB</p>
-      <h1 id="generation-title" class="page-title font-bold mt-2">전기의 발생</h1>
-
-      <p class="text-sky-100/75 mt-3 max-w-3xl leading-relaxed">
-       마찰하기 전에는 중성이던 빨대와 털가죽에서,
-       마찰 뒤 전자가 어떻게 이동하여 서로 다른 전하를 띠게 되는지 단계별로 살펴보세요.
-      </p>
-
-      <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-5 mt-6">
-
-       <div class="rounded-2xl border border-cyan-300/20 bg-slate-950/30 p-4 sm:p-5">
-
-        <div class="flex items-center justify-between gap-3 flex-wrap">
-         <div>
-          <p class="mini-kicker">STEP <span id="static-step-number">1</span> / 4</p>
-          <h2 id="static-step-title" class="font-bold text-xl mt-1">마찰 전 · 전기적으로 중성</h2>
-         </div>
-
-         <button type="button" onclick="nextStaticLesson()" id="static-next-btn" class="main-btn rounded-xl px-4 py-2 bg-yellow-300 text-[#07112b] font-bold">
-          다음 단계 →
-         </button>
-        </div>
-
-        <div id="static-lesson-stage" class="relative mt-5 rounded-2xl border border-cyan-300/15 bg-[#061331] min-h-[390px] overflow-hidden">
-
-         <div class="absolute inset-x-0 top-4 text-center text-sm text-sky-100/55">
-          전자(−)가 이동하는 모습을 관찰해 보세요
-         </div>
-
-         <div id="lesson-fur" class="charge-object absolute left-[7%] bottom-[55px] w-[225px] h-[155px] rounded-[55%] border-2 border-amber-200/40 bg-amber-900/70 shadow-lg">
-          <div class="charge-particles" id="fur-particles"></div>
-
-          <div class="charge-object-label">
-           <i data-lucide="brush" class="w-9 h-9 mx-auto text-amber-100"></i>
-           <b class="block mt-2">털가죽</b>
-           <span id="fur-charge" class="text-xs text-sky-100/65">중성</span>
-          </div>
-         </div>
-
-         <div id="lesson-straw" class="charge-object absolute right-[7%] bottom-[42px] w-[96px] h-[235px] rounded-[48px] border-4 border-cyan-200/60 bg-cyan-200/15 rotate-[10deg] shadow-lg">
-          <div class="charge-particles" id="straw-particles"></div>
-
-          <div class="charge-object-label">
-           <div class="text-3xl">🥤</div>
-           <b class="block mt-2">빨대</b>
-           <span id="straw-charge" class="text-xs text-sky-100/65">중성 · (+)와 (−)가 같음</span>
-          </div>
-         </div>
-
-         <div id="static-step-caption" class="absolute left-1/2 -translate-x-1/2 bottom-5 w-[92%] rounded-xl border border-white/10 bg-slate-950/55 px-4 py-3 text-center text-sm leading-relaxed text-sky-100/75">
-          마찰하기 전에는 두 물체의 (+)전하와 (−)전하가 균형을 이루어 전기적으로 중성입니다.
-         </div>
-
-        </div>
-       </div>
-
-
-       <aside class="rounded-2xl border border-yellow-300/20 bg-slate-950/25 p-5">
-        <p class="mini-kicker">핵심 정리</p>
-        <h2 class="font-bold text-xl mt-2">왜 빨대가 −전하가 될까?</h2>
-
-        <div class="space-y-3 mt-5">
-         <div class="rounded-xl border border-sky-300/15 bg-white/[.03] p-4">
-          <b>① 처음에는 중성</b>
-          <p class="text-sm text-sky-100/65 mt-1">두 물체는 (+)전하와 (−)전하의 양이 같아 전기적으로 중성입니다.</p>
-         </div>
-
-         <div class="rounded-xl border border-sky-300/15 bg-white/[.03] p-4">
-          <b>② 마찰하면 전자가 이동</b>
-          <p class="text-sm text-sky-100/65 mt-1">털가죽에서 빨대로 전자가 이동합니다.</p>
-         </div>
-
-         <div class="rounded-xl border border-yellow-300/20 bg-yellow-300/[.06] p-4">
-          <b>③ 빨대는 전자를 얻음</b>
-          <p class="text-sm text-sky-100/65 mt-1">전자(−)가 늘어나 빨대는 (−)전하를 띱니다.</p>
-         </div>
-
-         <div class="rounded-xl border border-pink-300/20 bg-pink-300/[.05] p-4">
-          <b>④ 털가죽은 전자를 잃음</b>
-          <p class="text-sm text-sky-100/65 mt-1">전자를 잃어 털가죽은 (+)전하를 띱니다.</p>
-         </div>
-        </div>
-
-        <div class="mt-5 rounded-xl border border-cyan-300/15 bg-cyan-300/[.05] p-4 text-sm leading-relaxed">
-         <b>한 줄로 기억!</b><br>
-         전자를 <strong>얻은 물체 → −전하</strong><br>
-         전자를 <strong>잃은 물체 → +전하</strong>
-        </div>
-       </aside>
+       <h2 id="exam-question" class="font-bold text-xl mt-1"></h2>
 
       </div>
 
-
-      <div class="mt-5 rounded-2xl border border-cyan-300/15 bg-slate-950/25 p-5">
-       <p class="mini-kicker">관찰하기</p>
-
-       <div class="grid sm:grid-cols-4 gap-3 mt-4">
-        <button type="button" onclick="setStaticLessonStep(1)" class="static-lesson-dot active rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>1</b><span class="block text-sm mt-1">마찰 전</span></button>
-        <button type="button" onclick="setStaticLessonStep(2)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>2</b><span class="block text-sm mt-1">마찰 시작</span></button>
-        <button type="button" onclick="setStaticLessonStep(3)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>3</b><span class="block text-sm mt-1">전자 이동</span></button>
-        <button type="button" onclick="setStaticLessonStep(4)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left"><b>4</b><span class="block text-sm mt-1">마찰 후</span></button>
-       </div>
+      <div id="exam-score" class="text-sm font-bold text-yellow-100">
+       아직 미채점
       </div>
 
      </div>
-    </section>
 
 
-    <!-- 전류와 전기 에너지 -->
-    <section id="energy" class="view">
-
-     <button type="button" onclick="showView('home')" class="main-btn rounded-xl px-4 py-2 flex items-center gap-2">
-      <i data-lucide="arrow-left" class="w-4 h-4"></i>← 홈으로 돌아가기
-     </button>
-
-     <div class="mt-6 mb-7">
-      <p class="mini-kicker">ELECTRIC CURRENT LAB</p>
-      <h1 class="page-title font-bold mt-2">전류와 전기 에너지</h1>
-      <p class="text-sky-100/70 mt-3">전지, 전구, 스위치, 전선을 직접 배치해 닫힌 회로를 만들어 보세요.</p>
+     <div class="exam-progress">
+      <div id="exam-progress-bar"></div>
      </div>
 
-     <div class="lab-card rounded-2xl p-5 sm:p-7">
+
+     <div id="exam-options" class="mt-4"></div>
+
+
+     <div id="exam-feedback" class="exam-feedback" style="display:none"></div>
+
+
+     <div class="exam-nav">
+
+      <button type="button" class="exam-btn" onclick="examPrev()">
+       ← 이전
+      </button>
+
+      <button type="button" class="exam-btn primary" onclick="examNext()">
+       다음 →
+      </button>
+
+      <button type="button" class="exam-btn danger" onclick="resetExam()">
+       문제 초기화
+      </button>
+
+      <button type="button" class="exam-btn primary" onclick="gradeExam()">
+       체점하기
+      </button>
+
+     </div>
+
+
+     <div id="exam-finish" class="exam-result" style="display:none"></div>
+
+    </div>
+
+
+    <aside class="exam-panel">
+
+     <p class="mini-kicker">
+      20문제 진행표
+     </p>
+
+     <h2 class="font-bold text-xl mt-1">
+      현재 시험 상태
+     </h2>
+
+     <p class="builder-hint mt-2">
+      문제 번호를 누르면 바로 이동합니다.
+      답은 자동 저장됩니다.
+     </p>
+
+     <div class="mt-3 text-xs text-sky-100/55">
+      <span class="text-green-300">● 정답</span>
+      <span class="ml-3 text-red-300">● 오답</span>
+      <span class="ml-3 text-sky-100/40">● 미응답</span>
+     </div>
+
+     <div id="exam-index-grid" class="exam-index-grid"></div>
+
+    </aside>
+
+   </div>
+
+  </section>
+
+
+  <!-- 전기의 발생 -->
+  <section id="generation" class="view">
+
+   <button type="button" onclick="showView('home')" class="main-btn rounded-xl px-4 py-2 flex items-center gap-2">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    ← 홈으로 돌아가기
+   </button>
+
+
+   <div class="lab-card neon-border rounded-2xl p-6 mt-5">
+
+    <p class="mini-kicker">
+     FRICTION ELECTRICITY LAB
+    </p>
+
+    <h1 id="generation-title" class="page-title font-bold mt-2">
+     전기의 발생
+    </h1>
+
+    <p class="text-sky-100/75 mt-3 max-w-3xl leading-relaxed">
+     마찰하기 전에는 중성이던 빨대와 털가죽에서,
+     마찰 뒤 전자가 어떻게 이동하여 서로 다른 전하를 띠게 되는지 단계별로 살펴보세요.
+    </p>
+
+
+    <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-5 mt-6">
+
+     <div class="rounded-2xl border border-cyan-300/20 bg-slate-950/30 p-4 sm:p-5">
 
       <div class="flex items-center justify-between gap-3 flex-wrap">
-       <div>
-        <p class="mini-kicker">CIRCUIT BUILDER</p>
-        <h2 class="font-bold text-xl mt-1">드래그해서 회로 만들기</h2>
-        <p class="builder-hint mt-2">왼쪽 부품을 오른쪽 회로판으로 끌어다 놓으세요.</p>
-       </div>
-
-       <button type="button" onclick="resetCircuitBuilder()" class="main-btn rounded-xl px-4 py-2 border border-sky-300/20 bg-slate-950/30">
-        처음부터 다시
-       </button>
-      </div>
-
-      <div class="grid lg:grid-cols-[.65fr_1.35fr] gap-5 mt-6">
-
-       <aside class="rounded-2xl border border-sky-300/15 bg-slate-950/25 p-4">
-        <h3 class="font-bold">부품</h3>
-
-        <div class="grid grid-cols-2 lg:grid-cols-1 gap-3 mt-4">
-         <div draggable="true" class="builder-piece rounded-xl border border-yellow-300/25 bg-yellow-300/10 p-4" data-piece="battery" ondragstart="dragPiece(event)"><i data-lucide="battery-charging"></i><b class="block mt-2">전지</b></div>
-         <div draggable="true" class="builder-piece rounded-xl border border-yellow-300/25 bg-yellow-300/10 p-4" data-piece="bulb" ondragstart="dragPiece(event)"><i data-lucide="lightbulb"></i><b class="block mt-2">전구</b></div>
-         <div draggable="true" class="builder-piece rounded-xl border border-cyan-300/25 bg-cyan-300/10 p-4" data-piece="switch" ondragstart="dragPiece(event)"><i data-lucide="toggle-right"></i><b class="block mt-2">스위치</b></div>
-         <div draggable="true" class="builder-piece rounded-xl border border-violet-300/25 bg-violet-300/10 p-4" data-piece="wire" ondragstart="dragPiece(event)"><i data-lucide="cable"></i><b class="block mt-2">전선</b></div>
-         <div draggable="true" class="builder-piece rounded-xl border border-pink-300/25 bg-pink-300/10 p-4" data-piece="resistor" ondragstart="dragPiece(event)"><i data-lucide="rectangle-horizontal"></i><b class="block mt-2">저항</b></div>
-         <div draggable="true" class="builder-piece rounded-xl border border-emerald-300/25 bg-emerald-300/10 p-4" data-piece="motor" ondragstart="dragPiece(event)"><i data-lucide="fan"></i><b class="block mt-2">모터</b></div>
-         <div draggable="true" class="builder-piece rounded-xl border border-orange-300/25 bg-orange-300/10 p-4" data-piece="ammeter" ondragstart="dragPiece(event)"><i data-lucide="gauge"></i><b class="block mt-2">전류계</b></div>
-         <div draggable="true" class="builder-piece rounded-xl border border-indigo-300/25 bg-indigo-300/10 p-4" data-piece="voltmeter" ondragstart="dragPiece(event)"><i data-lucide="gauge-circle"></i><b class="block mt-2">전압계</b></div>
-        </div>
-       </aside>
-
 
        <div>
-        <div id="circuit-dropzone" class="circuit-dropzone" ondragover="allowCircuitDrop(event)" ondrop="dropCircuitPiece(event)" ondragleave="this.classList.remove('dragover')">
 
-         <svg class="circuit-wire-preview" viewBox="0 0 800 390" preserveAspectRatio="none">
-          <path id="builder-wire-1" d="M170 95 H300" fill="none" stroke="#355d88" stroke-width="7"/>
-          <path id="builder-wire-2" d="M500 95 H630 V290" fill="none" stroke="#355d88" stroke-width="7"/>
-          <path id="builder-wire-3" d="M630 290 H500" fill="none" stroke="#355d88" stroke-width="7"/>
-          <path id="builder-wire-4" d="M300 290 H170 V95" fill="none" stroke="#355d88" stroke-width="7"/>
-         </svg>
-
-         <div class="absolute inset-0 grid place-items-center pointer-events-none">
-          <div id="builder-empty-message" class="text-center px-5">
-           <i data-lucide="move" class="w-9 h-9 mx-auto"></i>
-           <p class="font-bold mt-2">부품을 이곳으로 끌어오세요</p>
-          </div>
-         </div>
-
-        </div>
-
-        <p id="builder-status" class="builder-status mt-4 text-yellow-100 font-bold">
-         아직 회로가 완성되지 않았어요.
+        <p class="mini-kicker">
+         STEP <span id="static-step-number">1</span> / 4
         </p>
 
-        <button type="button" onclick="checkCircuitBuilder()" class="main-btn w-full mt-3 rounded-xl py-3 bg-yellow-300 text-[#07112b] font-bold">
-         회로 확인하기 ⚡
-        </button>
-
-        <div id="circuit-result" class="circuit-result">
-         <p class="mini-kicker">YOUR CIRCUIT</p>
-         <h3 class="font-bold text-lg mt-1">내가 만든 회로도</h3>
-         <svg id="circuit-result-svg" viewBox="0 0 800 400"></svg>
-         <p id="circuit-result-judgement" class="font-bold mt-2"></p>
-         <p class="result-note">네가 배치한 부품을 보기 쉽게 회로도로 자동 정렬합니다.</p>
-         <div id="schematic-legend" class="schematic-legend"></div>
-        </div>
+        <h2 id="static-step-title" class="font-bold text-xl mt-1">
+         마찰 전 · 전기적으로 중성
+        </h2>
 
        </div>
-      </div>
-     </div>
 
-     <div class="mt-8 pt-6 border-t border-sky-300/15">
-      <div class="flex items-center justify-between gap-3">
-       <p class="mini-kicker">RANDOM QUIZ · 10문제 중 3문제</p>
-       <p id="quiz-score" class="text-sm font-bold text-yellow-100">문제 0 / 3</p>
+       <button type="button" onclick="nextStaticLesson()" id="static-next-btn" class="main-btn rounded-xl px-4 py-2 bg-yellow-300 text-[#07112b] font-bold">
+        다음 단계 →
+       </button>
+
       </div>
 
-      <div id="random-quiz-content" class="mt-4"></div>
-     </div>
 
-    </section>
+      <div id="static-lesson-stage" class="relative mt-5 rounded-2xl border border-cyan-300/15 bg-[#061331] min-h-[390px] overflow-hidden">
 
-
-    <!-- 자기 작용 -->
-    <section id="magnet" class="view">
-
-     <button type="button" onclick="showView('home')" class="main-btn rounded-xl px-4 py-2 flex items-center gap-2">
-      <i data-lucide="arrow-left" class="w-4 h-4"></i>← 홈으로 돌아가기
-     </button>
-
-     <div class="mt-6 mb-7">
-      <p class="mini-kicker">ELECTROMAGNET LAB</p>
-      <h1 id="magnet-title" class="page-title font-bold mt-2">전류의 자기 작용</h1>
-      <p class="text-sky-100/70 mt-3">전자석의 전원을 켜고 끄면서 주위 나침반이 자기장 방향을 따라 어떻게 바뀌는지 관찰해 보세요.</p>
-     </div>
-
-     <div class="grid lg:grid-cols-[1.35fr_.65fr] gap-6">
-
-      <div class="lab-card rounded-2xl p-6">
-
-       <div class="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-         <p class="mini-kicker">COMPASS FIELD LAB</p>
-         <h2 class="font-bold text-xl mt-1">전자석과 나침반</h2>
-         <p class="text-sm text-sky-100/65 mt-2">전자석을 켜면 주위 나침반의 방향이 바뀝니다.</p>
-        </div>
-
-        <button id="electromagnet-toggle" type="button" onclick="toggleElectromagnet()" class="main-btn rounded-xl px-5 py-3 bg-slate-950/40 border border-cyan-300/25 font-bold">
-         전자석 켜기
-        </button>
+       <div class="absolute inset-x-0 top-4 text-center text-sm text-sky-100/55">
+        전자(−)가 이동하는 모습을 관찰해 보세요
        </div>
 
-       <div id="compass-stage" class="relative mt-6 rounded-2xl border border-cyan-300/15 bg-[#061331] min-h-[470px] overflow-hidden">
 
-        <div class="absolute inset-x-0 top-4 text-center text-sm text-sky-100/55">
-         전자석 주변의 자기장 방향을 나침반으로 확인해 보세요
-        </div>
+       <div id="lesson-fur" class="charge-object absolute left-[7%] bottom-[55px] w-[225px] h-[155px] rounded-[55%] border-2 border-amber-200/40 bg-amber-900/70 shadow-lg">
 
-        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 470">
+        <div class="charge-particles" id="fur-particles"></div>
 
-         <g id="field-lines" opacity=".22" fill="none" stroke="#60dfff" stroke-width="2">
-          <path d="M230 235 C235 95 565 95 570 235"/>
-          <path d="M230 235 C235 375 565 375 570 235"/>
-          <path d="M255 235 C265 145 535 145 545 235"/>
-          <path d="M255 235 C265 325 535 325 545 235"/>
-         </g>
-
-         <g id="electromagnet-graphic">
-          <rect x="285" y="200" width="230" height="70" rx="16" fill="#182d54" stroke="#a6e9ff" stroke-width="3"/>
-
-          <g fill="none" stroke="#f8ef56" stroke-width="5">
-           <path d="M300 205 Q315 235 300 265 M315 205 Q330 235 315 265 M330 205 Q345 235 330 265 M345 205 Q360 235 345 265 M360 205 Q375 235 360 265 M375 205 Q390 235 375 265 M390 205 Q405 235 390 265 M405 205 Q420 235 405 265 M420 205 Q435 235 420 265 M435 205 Q450 235 435 265 M450 205 Q465 235 450 265 M465 205 Q480 235 465 265 M480 205 Q495 235 480 265 M495 205 Q510 235 495 265"/>
-          </g>
-
-          <circle cx="280" cy="235" r="14" fill="#f8ef56"/>
-          <circle cx="520" cy="235" r="14" fill="#60dfff"/>
-
-          <text x="275" y="240" fill="#07112b" font-size="18" font-weight="800" text-anchor="middle">N</text>
-          <text x="525" y="240" fill="#07112b" font-size="18" font-weight="800" text-anchor="middle">S</text>
-         </g>
-        </svg>
-
-        <div id="compass-needles" class="absolute inset-0 pointer-events-none"></div>
-
-        <div class="absolute inset-x-0 bottom-5 text-center">
-         <span id="electromagnet-state" class="inline-flex items-center gap-2 rounded-full border border-sky-300/15 bg-slate-950/55 px-4 py-2 text-sm font-bold text-sky-100/80">
-          전자석 꺼짐 · 나침반은 위쪽을 가리킴
+        <div class="charge-object-label">
+         <i data-lucide="brush" class="w-9 h-9 mx-auto text-amber-100"></i>
+         <b class="block mt-2">털가죽</b>
+         <span id="fur-charge" class="text-xs text-sky-100/65">
+          중성
          </span>
         </div>
 
        </div>
+
+
+       <div id="lesson-straw" class="charge-object absolute right-[7%] bottom-[42px] w-[96px] h-[235px] rounded-[48px] border-4 border-cyan-200/60 bg-cyan-200/15 rotate-[10deg] shadow-lg">
+
+        <div class="charge-particles" id="straw-particles"></div>
+
+        <div class="charge-object-label">
+         <div class="text-3xl">🥤</div>
+         <b class="block mt-2">빨대</b>
+         <span id="straw-charge" class="text-xs text-sky-100/65">
+          중성 · (+)와 (−)가 같음
+         </span>
+        </div>
+
+       </div>
+
+
+       <div id="static-step-caption" class="absolute left-1/2 -translate-x-1/2 bottom-5 w-[92%] rounded-xl border border-white/10 bg-slate-950/55 px-4 py-3 text-center text-sm leading-relaxed text-sky-100/75">
+        마찰하기 전에는 두 물체의 (+)전하와 (−)전하가 균형을 이루어 전기적으로 중성입니다.
+       </div>
+
+      </div>
+
+     </div>
+
+
+     <aside class="rounded-2xl border border-yellow-300/20 bg-slate-950/25 p-5">
+
+      <p class="mini-kicker">
+       핵심 정리
+      </p>
+
+      <h2 class="font-bold text-xl mt-2">
+       왜 빨대가 −전하가 될까?
+      </h2>
+
+
+      <div class="space-y-3 mt-5">
+
+       <div class="rounded-xl border border-sky-300/15 bg-white/[.03] p-4">
+        <b>① 처음에는 중성</b>
+        <p class="text-sm text-sky-100/65 mt-1">
+         두 물체는 (+)전하와 (−)전하의 양이 같아 전기적으로 중성입니다.
+        </p>
+       </div>
+
+       <div class="rounded-xl border border-sky-300/15 bg-white/[.03] p-4">
+        <b>② 마찰하면 전자가 이동</b>
+        <p class="text-sm text-sky-100/65 mt-1">
+         털가죽에서 빨대로 전자가 이동합니다.
+        </p>
+       </div>
+
+       <div class="rounded-xl border border-yellow-300/20 bg-yellow-300/[.06] p-4">
+        <b>③ 빨대는 전자를 얻음</b>
+        <p class="text-sm text-sky-100/65 mt-1">
+         전자(−)가 늘어나 빨대는 (−)전하를 띱니다.
+        </p>
+       </div>
+
+       <div class="rounded-xl border border-pink-300/20 bg-pink-300/[.05] p-4">
+        <b>④ 털가죽은 전자를 잃음</b>
+        <p class="text-sm text-sky-100/65 mt-1">
+         전자를 잃어 털가죽은 (+)전하를 띱니다.
+        </p>
+       </div>
+
       </div>
 
 
-      <aside class="lab-card rounded-2xl p-6">
-       <p class="mini-kicker">관찰 포인트</p>
-       <h2 class="font-bold text-xl mt-2">무엇이 바뀔까요?</h2>
+      <div class="mt-5 rounded-xl border border-cyan-300/15 bg-cyan-300/[.05] p-4 text-sm leading-relaxed">
+       <b>한 줄로 기억!</b><br>
+       전자를 <strong>얻은 물체 → −전하</strong><br>
+       전자를 <strong>잃은 물체 → +전하</strong>
+      </div>
 
-       <div class="space-y-3 mt-5 text-sm text-sky-100/70 leading-relaxed">
-        <div class="rounded-xl border border-sky-300/15 bg-white/[.03] p-4">
-         <b>전자석 OFF</b>
-         <p class="mt-1">나침반은 위쪽을 가리킵니다.</p>
-        </div>
+     </aside>
 
-        <div class="rounded-xl border border-yellow-300/20 bg-yellow-300/[.05] p-4">
-         <b>전자석 ON</b>
-         <p class="mt-1">전류가 흐르면 자기장이 생기고 나침반 방향이 바뀝니다.</p>
-        </div>
+    </div>
 
-        <div class="rounded-xl border border-cyan-300/15 bg-cyan-300/[.05] p-4">
-         <b>핵심</b>
-         <p class="mt-1">전류가 흐르는 코일은 자기장을 만듭니다.</p>
-        </div>
-       </div>
-      </aside>
+
+    <div class="mt-5 rounded-2xl border border-cyan-300/15 bg-slate-950/25 p-5">
+
+     <p class="mini-kicker">
+      관찰하기
+     </p>
+
+     <div class="grid sm:grid-cols-4 gap-3 mt-4">
+
+      <button type="button" onclick="setStaticLessonStep(1)" class="static-lesson-dot active rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left">
+       <b>1</b>
+       <span class="block text-sm mt-1">마찰 전</span>
+      </button>
+
+      <button type="button" onclick="setStaticLessonStep(2)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left">
+       <b>2</b>
+       <span class="block text-sm mt-1">마찰 시작</span>
+      </button>
+
+      <button type="button" onclick="setStaticLessonStep(3)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left">
+       <b>3</b>
+       <span class="block text-sm mt-1">전자 이동</span>
+      </button>
+
+      <button type="button" onclick="setStaticLessonStep(4)" class="static-lesson-dot rounded-xl border border-sky-300/15 bg-white/[.03] p-3 text-left">
+       <b>4</b>
+       <span class="block text-sm mt-1">마찰 후</span>
+      </button>
 
      </div>
-    </section>
 
-   </main>
-  </div>
-
-  <div id="toast" class="toast fixed z-50 bottom-5 left-1/2 -translate-x-1/2 rounded-2xl border border-yellow-200/50 bg-[#132752] px-5 py-3 text-center font-bold text-yellow-100 shadow-2xl" aria-live="polite"></div>
-
-  <!-- 시험 초기화 확인 모달: 브라우저 confirm() 대신 사용 (샌드박스 환경에서 confirm이 막히는 문제 해결) -->
-  <div id="exam-reset-modal" class="exam-reset-overlay" aria-hidden="true">
-   <div class="exam-reset-box" role="dialog" aria-modal="true" aria-labelledby="exam-reset-title">
-    <p id="exam-reset-title" class="font-bold text-lg">시험 초기화</p>
-    <p class="text-sm text-sky-100/70 mt-2">현재 시험을 초기화하고 새로운 20문제를 뽑을까요?</p>
-    <div class="exam-reset-actions">
-     <button type="button" class="exam-btn" onclick="cancelExamReset()">취소</button>
-     <button type="button" class="exam-btn primary" onclick="confirmExamReset()">초기화</button>
     </div>
+
    </div>
+
+  </section>
+
+
+  <!-- 전류와 전기 에너지 -->
+  <section id="energy" class="view">
+
+   <button type="button" onclick="showView('home')" class="main-btn rounded-xl px-4 py-2 flex items-center gap-2">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    ← 홈으로 돌아가기
+   </button>
+
+
+   <div class="mt-6 mb-7">
+
+    <p class="mini-kicker">
+     ELECTRIC CURRENT LAB
+    </p>
+
+    <h1 class="page-title font-bold mt-2">
+     전류와 전기 에너지
+    </h1>
+
+    <p class="text-sky-100/70 mt-3">
+     전지, 전구, 스위치, 전선을 직접 배치해 닫힌 회로를 만들어 보세요.
+    </p>
+
+   </div>
+
+
+   <div class="lab-card rounded-2xl p-5 sm:p-7">
+
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+
+     <div>
+
+      <p class="mini-kicker">
+       CIRCUIT BUILDER
+      </p>
+
+      <h2 class="font-bold text-xl mt-1">
+       드래그해서 회로 만들기
+      </h2>
+
+      <p class="builder-hint mt-2">
+       왼쪽 부품을 오른쪽 회로판으로 끌어다 놓으세요.
+      </p>
+
+     </div>
+
+     <button type="button" onclick="resetCircuitBuilder()" class="main-btn rounded-xl px-4 py-2 border border-sky-300/20 bg-slate-950/30">
+      처음부터 다시
+     </button>
+
+    </div>
+
+
+    <div class="grid lg:grid-cols-[.65fr_1.35fr] gap-5 mt-6">
+
+     <aside class="rounded-2xl border border-sky-300/15 bg-slate-950/25 p-4">
+
+      <h3 class="font-bold">
+       부품
+      </h3>
+
+
+      <div class="grid grid-cols-2 lg:grid-cols-1 gap-3 mt-4">
+
+       <div draggable="true" class="builder-piece rounded-xl border border-yellow-300/25 bg-yellow-300/10 p-4" data-piece="battery" ondragstart="dragPiece(event)">
+        <i data-lucide="battery-charging"></i>
+        <b class="block mt-2">전지</b>
+       </div>
+
+       <div draggable="true" class="builder-piece rounded-xl border border-yellow-300/25 bg-yellow-300/10 p-4" data-piece="bulb" ondragstart="dragPiece(event)">
+        <i data-lucide="lightbulb"></i>
+        <b class="block mt-2">전구</b>
+       </div>
+
+       <div draggable="true" class="builder-piece rounded-xl border border-cyan-300/25 bg-cyan-300/10 p-4" data-piece="switch" ondragstart="dragPiece(event)">
+        <i data-lucide="toggle-right"></i>
+        <b class="block mt-2">스위치</b>
+       </div>
+
+       <div draggable="true" class="builder-piece rounded-xl border border-violet-300/25 bg-violet-300/10 p-4" data-piece="wire" ondragstart="dragPiece(event)">
+        <i data-lucide="cable"></i>
+        <b class="block mt-2">전선</b>
+       </div>
+
+       <div draggable="true" class="builder-piece rounded-xl border border-pink-300/25 bg-pink-300/10 p-4" data-piece="resistor" ondragstart="dragPiece(event)">
+        <i data-lucide="rectangle-horizontal"></i>
+        <b class="block mt-2">저항</b>
+       </div>
+
+       <div draggable="true" class="builder-piece rounded-xl border border-emerald-300/25 bg-emerald-300/10 p-4" data-piece="motor" ondragstart="dragPiece(event)">
+        <i data-lucide="fan"></i>
+        <b class="block mt-2">모터</b>
+       </div>
+
+       <div draggable="true" class="builder-piece rounded-xl border border-orange-300/25 bg-orange-300/10 p-4" data-piece="ammeter" ondragstart="dragPiece(event)">
+        <i data-lucide="gauge"></i>
+        <b class="block mt-2">전류계</b>
+       </div>
+
+       <div draggable="true" class="builder-piece rounded-xl border border-indigo-300/25 bg-indigo-300/10 p-4" data-piece="voltmeter" ondragstart="dragPiece(event)">
+        <i data-lucide="gauge-circle"></i>
+        <b class="block mt-2">전압계</b>
+       </div>
+
+      </div>
+
+     </aside>
+
+
+     <div>
+
+      <div id="circuit-dropzone" class="circuit-dropzone" ondragover="allowCircuitDrop(event)" ondrop="dropCircuitPiece(event)" ondragleave="this.classList.remove('dragover')">
+
+       <svg class="circuit-wire-preview" viewBox="0 0 800 390" preserveAspectRatio="none">
+
+        <path id="builder-wire-1" d="M170 95 H300" fill="none" stroke="#355d88" stroke-width="7"/>
+        <path id="builder-wire-2" d="M500 95 H630 V290" fill="none" stroke="#355d88" stroke-width="7"/>
+        <path id="builder-wire-3" d="M630 290 H500" fill="none" stroke="#355d88" stroke-width="7"/>
+        <path id="builder-wire-4" d="M300 290 H170 V95" fill="none" stroke="#355d88" stroke-width="7"/>
+
+       </svg>
+
+
+       <div class="absolute inset-0 grid place-items-center pointer-events-none">
+
+        <div id="builder-empty-message" class="text-center px-5">
+
+         <i data-lucide="move" class="w-9 h-9 mx-auto"></i>
+
+         <p class="font-bold mt-2">
+          부품을 이곳으로 끌어오세요
+         </p>
+
+        </div>
+
+       </div>
+
+      </div>
+
+
+      <p id="builder-status" class="builder-status mt-4 text-yellow-100 font-bold">
+       아직 회로가 완성되지 않았어요.
+      </p>
+
+
+      <button type="button" onclick="checkCircuitBuilder()" class="main-btn w-full mt-3 rounded-xl py-3 bg-yellow-300 text-[#07112b] font-bold">
+       회로 확인하기 ⚡
+      </button>
+
+
+      <div id="circuit-result" class="circuit-result">
+
+       <p class="mini-kicker">
+        YOUR CIRCUIT
+       </p>
+
+       <h3 class="font-bold text-lg mt-1">
+        내가 만든 회로도
+       </h3>
+
+       <svg id="circuit-result-svg" viewBox="0 0 800 400"></svg>
+
+       <p id="circuit-result-judgement" class="font-bold mt-2"></p>
+
+       <p class="result-note">
+        네가 배치한 부품을 보기 쉽게 회로도로 자동 정렬합니다.
+       </p>
+
+       <div id="schematic-legend" class="schematic-legend"></div>
+
+      </div>
+
+     </div>
+
+    </div>
+
+   </div>
+
+
+   <div class="mt-8 pt-6 border-t border-sky-300/15">
+
+    <div class="flex items-center justify-between gap-3">
+
+     <p class="mini-kicker">
+      RANDOM QUIZ · 10문제 중 3문제
+     </p>
+
+     <p id="quiz-score" class="text-sm font-bold text-yellow-100">
+      문제 0 / 3
+     </p>
+
+    </div>
+
+    <div id="random-quiz-content" class="mt-4"></div>
+
+   </div>
+
+  </section>
+
+
+  <!-- 자기 작용 -->
+  <section id="magnet" class="view">
+
+   <button type="button" onclick="showView('home')" class="main-btn rounded-xl px-4 py-2 flex items-center gap-2">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    ← 홈으로 돌아가기
+   </button>
+
+
+   <div class="mt-6 mb-7">
+
+    <p class="mini-kicker">
+     ELECTROMAGNET LAB
+    </p>
+
+    <h1 id="magnet-title" class="page-title font-bold mt-2">
+     전류의 자기 작용
+    </h1>
+
+    <p class="text-sky-100/70 mt-3">
+     전자석의 전원을 켜고 끄면서 주위 나침반이 자기장 방향을 따라 어떻게 바뀌는지 관찰해 보세요.
+    </p>
+
+   </div>
+
+
+   <div class="grid lg:grid-cols-[1.35fr_.65fr] gap-6">
+
+
+    <div class="lab-card rounded-2xl p-6">
+
+     <div class="flex items-center justify-between gap-3 flex-wrap">
+
+      <div>
+
+       <p class="mini-kicker">
+        COMPASS FIELD LAB
+       </p>
+
+       <h2 class="font-bold text-xl mt-1">
+        전자석과 나침반
+       </h2>
+
+       <p class="text-sm text-sky-100/65 mt-2">
+        전자석을 켜면 주위 나침반의 방향이 바뀝니다.
+       </p>
+
+      </div>
+
+
+      <button id="electromagnet-toggle" type="button" onclick="toggleElectromagnet()" class="main-btn rounded-xl px-5 py-3 bg-slate-950/40 border border-cyan-300/25 font-bold">
+       전자석 켜기
+      </button>
+
+     </div>
+
+
+     <div id="compass-stage" class="relative mt-6 rounded-2xl border border-cyan-300/15 bg-[#061331] min-h-[470px] overflow-hidden">
+
+      <div class="absolute inset-x-0 top-4 text-center text-sm text-sky-100/55">
+       전자석 주변의 자기장 방향을 나침반으로 확인해 보세요
+      </div>
+
+
+      <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 470">
+
+       <g id="field-lines" opacity=".22" fill="none" stroke="#60dfff" stroke-width="2">
+
+        <path d="M230 235 C235 95 565 95 570 235"/>
+        <path d="M230 235 C235 375 565 375 570 235"/>
+        <path d="M255 235 C265 145 535 145 545 235"/>
+        <path d="M255 235 C265 325 535 325 545 235"/>
+
+       </g>
+
+
+       <g id="electromagnet-graphic">
+
+        <rect x="285" y="200" width="230" height="70" rx="16" fill="#182d54" stroke="#a6e9ff" stroke-width="3"/>
+
+        <g fill="none" stroke="#f8ef56" stroke-width="5">
+
+         <path d="M300 205 Q315 235 300 265 M315 205 Q330 235 315 265 M330 205 Q345 235 330 265 M345 205 Q360 235 345 265 M360 205 Q375 235 360 265 M375 205 Q390 235 375 265 M390 205 Q405 235 390 265 M405 205 Q420 235 405 265 M420 205 Q435 235 420 265 M435 205 Q450 235 435 265 M450 205 Q465 235 450 265 M465 205 Q480 235 465 265 M480 205 Q495 235 480 265 M495 205 Q510 235 495 265"/>
+
+        </g>
+
+
+        <circle cx="280" cy="235" r="14" fill="#f8ef56"/>
+        <circle cx="520" cy="235" r="14" fill="#60dfff"/>
+
+        <text x="275" y="240" fill="#07112b" font-size="18" font-weight="800" text-anchor="middle">
+         N
+        </text>
+
+        <text x="525" y="240" fill="#07112b" font-size="18" font-weight="800" text-anchor="middle">
+         S
+        </text>
+
+       </g>
+
+      </svg>
+
+
+      <div id="compass-needles" class="absolute inset-0 pointer-events-none"></div>
+
+
+      <div class="absolute inset-x-0 bottom-5 text-center">
+
+       <span id="electromagnet-state" class="inline-flex items-center gap-2 rounded-full border border-sky-300/15 bg-slate-950/55 px-4 py-2 text-sm font-bold text-sky-100/80">
+        전자석 꺼짐 · 나침반은 위쪽을 가리킴
+       </span>
+
+      </div>
+
+     </div>
+
+    </div>
+
+
+    <aside class="lab-card rounded-2xl p-6">
+
+     <p class="mini-kicker">
+      관찰 포인트
+     </p>
+
+     <h2 class="font-bold text-xl mt-2">
+      무엇이 바뀔까요?
+     </h2>
+
+
+     <div class="space-y-3 mt-5 text-sm text-sky-100/70 leading-relaxed">
+
+      <div class="rounded-xl border border-sky-300/15 bg-white/[.03] p-4">
+
+       <b>전자석 OFF</b>
+
+       <p class="mt-1">
+        나침반은 위쪽을 가리킵니다.
+       </p>
+
+      </div>
+
+
+      <div class="rounded-xl border border-yellow-300/20 bg-yellow-300/[.05] p-4">
+
+       <b>전자석 ON</b>
+
+       <p class="mt-1">
+        전류가 흐르면 자기장이 생기고 나침반 방향이 바뀝니다.
+       </p>
+
+      </div>
+
+
+      <div class="rounded-xl border border-cyan-300/15 bg-cyan-300/[.05] p-4">
+
+       <b>핵심</b>
+
+       <p class="mt-1">
+        전류가 흐르는 코일은 자기장을 만듭니다.
+       </p>
+
+      </div>
+
+     </div>
+
+    </aside>
+
+   </div>
+
+  </section>
+
+ </main>
+
+</div>
+
+
+<div id="toast" class="toast fixed z-50 bottom-5 left-1/2 -translate-x-1/2 rounded-2xl border border-yellow-200/50 bg-[#132752] px-5 py-3 text-center font-bold text-yellow-100 shadow-2xl" aria-live="polite"></div>
+
+
+<!-- 시험 초기화 확인 모달 -->
+<div id="exam-reset-modal" class="exam-reset-overlay" aria-hidden="true">
+
+ <div class="exam-reset-box" role="dialog" aria-modal="true" aria-labelledby="exam-reset-title">
+
+  <p id="exam-reset-title" class="font-bold text-lg">
+   시험 초기화
+  </p>
+
+  <p class="text-sm text-sky-100/70 mt-2">
+   현재 시험을 초기화하고 새로운 20문제를 뽑을까요?
+  </p>
+
+  <div class="exam-reset-actions">
+
+   <button type="button" class="exam-btn" onclick="cancelExamReset()">
+    취소
+   </button>
+
+   <button type="button" class="exam-btn primary" onclick="confirmExamReset()">
+    초기화
+   </button>
+
   </div>
 
-  <script>
-    /* =========================
-       기본 학습 데이터 (로컬 저장, 서버 SDK 없이 동작)
-    ========================= */
+ </div>
 
-    const defaultState = {
-      total_exp:0,
-      level:1,
-      completed_concepts:0,
-      completed_experiments:0,
-      solved_questions:0,
-      correct_answers:0,
-      earned_badges:"",
-      completed_puzzles:0,
-      last_activity:""
+</div>
+
+
+<script>
+
+ /* =========================
+    기본 학습 데이터
+ ========================= */
+
+ const defaultState = {
+  total_exp:0,
+  level:1,
+  completed_concepts:0,
+  completed_experiments:0,
+  solved_questions:0,
+  correct_answers:0,
+  earned_badges:"",
+  completed_puzzles:0,
+  last_activity:""
+ };
+
+ const STATE_STORAGE_KEY="electroLabStateV1";
+
+ let state={...defaultState};
+
+ const rewards=new Set();
+
+
+ function showToast(message){
+
+  const toast=document.getElementById("toast");
+
+  toast.textContent=message;
+
+  toast.classList.add("show");
+
+  clearTimeout(showToast.timer);
+
+  showToast.timer=setTimeout(
+   ()=>toast.classList.remove("show"),
+   2600
+  );
+ }
+
+
+ function renderStats(){
+
+  document.getElementById("hud-exp").textContent=
+   state.total_exp+" EXP";
+
+ }
+
+
+ function saveState(){
+
+  try{
+
+   localStorage.setItem(
+    STATE_STORAGE_KEY,
+    JSON.stringify(state)
+   );
+
+  }catch(e){}
+
+ }
+
+
+ function loadState(){
+
+  try{
+
+   const raw=localStorage.getItem(
+    STATE_STORAGE_KEY
+   );
+
+   if(raw){
+
+    state={
+     ...defaultState,
+     ...JSON.parse(raw)
     };
 
-    const STATE_STORAGE_KEY="electroLabStateV1";
-
-    let state={...defaultState};
-    const rewards=new Set();
-
-
-    function showToast(message){
-      const toast=document.getElementById("toast");
-      toast.textContent=message;
-      toast.classList.add("show");
-      clearTimeout(showToast.timer);
-      showToast.timer=setTimeout(
-        ()=>toast.classList.remove("show"),
-        2600
-      );
-    }
-
-
-    function renderStats(){
-      document.getElementById("hud-exp").textContent=
-        state.total_exp+" EXP";
-    }
-
-
-    function saveState(){
-      try{
-        localStorage.setItem(
-          STATE_STORAGE_KEY,
-          JSON.stringify(state)
-        );
-      }catch(e){}
-    }
-
-
-    function loadState(){
-      try{
-        const raw=localStorage.getItem(STATE_STORAGE_KEY);
-        if(raw){
-          state={...defaultState,...JSON.parse(raw)};
-        }
-      }catch(e){}
-      renderStats();
-    }
-
-
-    function saveChanges(changes){
-      const total=
-        changes.total_exp!==undefined
-        ? changes.total_exp
-        : state.total_exp;
-
-      state={
-        ...state,
-        ...changes,
-        total_exp:total,
-        level:Math.min(
-          5,
-          Math.floor(total/200)+1
-        ),
-        last_activity:new Date().toISOString()
-      };
-
-      renderStats();
-      saveState();
-    }
-
-
-    function award(key,amount,changes,message){
-      if(rewards.has(key))return;
-
-      rewards.add(key);
-
-      saveChanges({
-        ...changes,
-        total_exp:state.total_exp+amount
-      });
-
-      showToast(
-        "+"+amount+" EXP · "+message
-      );
-    }
-
-
-    function showView(id){
-
-      document
-        .querySelectorAll(".view")
-        .forEach(view=>
-          view.classList.toggle(
-            "active",
-            view.id===id
-          )
-        );
-
-      window.scrollTo({
-        top:0,
-        behavior:"smooth"
-      });
-
-      if(id==="generation"){
-        resetStaticLab();
-      }
-
-      if(id==="energy"){
-        setupRandomQuiz();
-        resetCircuitBuilder();
-      }
-
-      if(id==="magnet"){
-        electromagnetOn=false;
-        updateElectromagnetUI();
-      }
-
-      if(id==="exam"){
-        loadExamState();
-        renderExam();
-      }
-    }
-
-
-    /* =========================
-       전기의 발생
-    ========================= */
-
-    let staticLessonStep=1;
-
-    const staticLessonData={
-      1:{
-        title:"마찰 전 · 전기적으로 중성",
-        caption:"마찰하기 전에는 두 물체의 (+)전하와 (−)전하가 균형을 이루어 전기적으로 중성입니다."
-      },
-      2:{
-        title:"마찰 시작 · 전자가 움직일 준비",
-        caption:"두 물체를 마찰하면 전자가 한 물체에서 다른 물체로 이동할 수 있습니다."
-      },
-      3:{
-        title:"마찰 중 · 전자 이동",
-        caption:"이 실험에서는 털가죽의 전자가 빨대로 이동합니다."
-      },
-      4:{
-        title:"마찰 후 · 빨대는 −, 털가죽은 +",
-        caption:"빨대는 전자를 얻어 (−)전하를 띠고, 털가죽은 전자를 잃어 (+)전하를 띱니다."
-      }
-    };
-
-
-    const baseChargePattern=[
-      ['plus',12,18],
-      ['minus',30,18],
-      ['plus',48,18],
-      ['minus',66,18],
-      ['plus',84,18],
-
-      ['minus',21,38],
-      ['plus',39,38],
-      ['minus',57,38],
-      ['plus',75,38],
-
-      ['plus',12,60],
-      ['minus',30,60],
-      ['plus',48,60],
-      ['minus',66,60],
-      ['plus',84,60],
-
-      ['minus',21,80],
-      ['plus',39,80],
-      ['minus',57,80],
-      ['plus',75,80]
-    ];
-
-
-    function addParticle(
-      container,
-      sign,
-      x,
-      y,
-      moving=false
-    ){
-      const e=document.createElement("div");
-
-      e.className=
-        "charge-particle "+
-        sign+
-        (moving?" moving":"");
-
-      e.textContent=
-        sign==="minus"
-        ?"−"
-        :"+";
-
-      e.style.left=x+"%";
-      e.style.top=y+"%";
-
-      container.appendChild(e);
-
-      return e;
-    }
-
-
-    function renderCharges(
-      containerId,
-      type,
-      extraSign=null,
-      extraCount=0,
-      movingMinus=false
-    ){
-
-      const container=
-        document.getElementById(containerId);
-
-      if(!container)return;
-
-      container.innerHTML="";
-
-      const scale=
-        type==="straw"
-        ?0.82
-        :1;
-
-      const xOffset=
-        type==="straw"
-        ?8
-        :0;
-
-
-      baseChargePattern.forEach(
-        ([sign,x,y])=>{
-          addParticle(
-            container,
-            sign,
-            xOffset+x*scale,
-            y,
-            movingMinus&&sign==="minus"
-          );
-        }
-      );
-
-
-      if(extraSign&&extraCount){
-
-        const extraPositions=[
-          [18,28],
-          [36,48],
-          [54,28],
-          [72,48],
-          [88,28]
-        ];
-
-        for(
-          let i=0;
-          i<extraCount;
-          i++
-        ){
-
-          const pos=
-            extraPositions[
-              i%extraPositions.length
-            ];
-
-          const x=
-            type==="straw"
-            ?10+pos[0]*.82
-            :pos[0];
-
-          addParticle(
-            container,
-            extraSign,
-            x,
-            pos[1],
-            false
-          );
-        }
-      }
-    }
-
-
-    function animateElectronsToStraw(){
-
-      const fur=
-        document.getElementById(
-          "fur-particles"
-        );
-
-      const straw=
-        document.getElementById(
-          "straw-particles"
-        );
-
-      fur.innerHTML="";
-      straw.innerHTML="";
-
-      renderCharges(
-        "fur-particles",
-        "fur",
-        null,
-        0,
-        true
-      );
-
-      renderCharges(
-        "straw-particles",
-        "straw"
-      );
-
-      const movers=[];
-
-
-      [0,1,2,3,4].forEach(
-        i=>{
-          const e=
-            addParticle(
-              fur,
-              "minus",
-              64,
-              18+i*15,
-              false
-            );
-
-          movers.push(e);
-
-          requestAnimationFrame(
-            ()=>{
-              e.style.transition=
-                "transform 1.2s ease "+
-                i*.1+
-                "s,left 1.2s ease "+
-                i*.1+
-                "s";
-
-              e.style.transform=
-                "translate(245px,"+
-                (i-2)*7+
-                "px)";
-
-              e.style.left="94%";
-            }
-          );
-        }
-      );
-
-
-      setTimeout(
-        ()=>{
-          movers.forEach(
-            e=>e.remove()
-          );
-
-          renderCharges(
-            "fur-particles",
-            "fur",
-            "plus",
-            5,
-            false
-          );
-
-          renderCharges(
-            "straw-particles",
-            "straw",
-            "minus",
-            5,
-            false
-          );
-        },
-        1900
-      );
-    }
-
-
-    function setStaticLessonStep(step){
-
-      staticLessonStep=step;
-
-      const data=
-        staticLessonData[step];
-
-      document.getElementById(
-        "static-step-number"
-      ).textContent=step;
-
-      document.getElementById(
-        "static-step-title"
-      ).textContent=data.title;
-
-      document.getElementById(
-        "static-step-caption"
-      ).textContent=data.caption;
-
-
-      document
-        .querySelectorAll(
-          ".static-lesson-dot"
-        )
-        .forEach(
-          (b,i)=>
-            b.classList.toggle(
-              "active",
-              i===step-1
-            )
-        );
-
-
-      document.getElementById(
-        "static-next-btn"
-      ).textContent=
-        step===4
-        ?"처음부터 다시 ↺"
-        :"다음 단계 →";
-
-
-      const strawCharge=
-        document.getElementById(
-          "straw-charge"
-        );
-
-      const furCharge=
-        document.getElementById(
-          "fur-charge"
-        );
-
-
-      if(step===1){
-
-        strawCharge.textContent=
-          "중성 · (+)와 (−)가 같음";
-
-        furCharge.textContent=
-          "중성 · (+)와 (−)가 같음";
-
-        renderCharges(
-          "fur-particles",
-          "fur"
-        );
-
-        renderCharges(
-          "straw-particles",
-          "straw"
-        );
-
-      }else if(step===2){
-
-        strawCharge.textContent=
-          "중성 · 아직 균형";
-
-        furCharge.textContent=
-          "중성 · 아직 균형";
-
-        renderCharges(
-          "fur-particles",
-          "fur",
-          null,
-          0,
-          true
-        );
-
-        renderCharges(
-          "straw-particles",
-          "straw"
-        );
-
-      }else if(step===3){
-
-        strawCharge.textContent=
-          "전자(−)가 들어오는 중";
-
-        furCharge.textContent=
-          "전자(−)가 빠져나가는 중";
-
-        animateElectronsToStraw();
-
-      }else{
-
-        strawCharge.textContent=
-          "−전하 · (−)가 더 많음";
-
-        furCharge.textContent=
-          "+전하 · (+)가 더 많음";
-
-        renderCharges(
-          "fur-particles",
-          "fur",
-          "plus",
-          5,
-          false
-        );
-
-        renderCharges(
-          "straw-particles",
-          "straw",
-          "minus",
-          5,
-          false
-        );
-      }
-    }
-
-
-    function nextStaticLesson(){
-
-      if(staticLessonStep===4){
-        setStaticLessonStep(1);
-        return;
-      }
-
-      const next=
-        staticLessonStep+1;
-
-      setStaticLessonStep(next);
-
-      if(next===4){
-
-        award(
-          "static",
-          80,
-          {
-            completed_concepts:
-              state.completed_concepts+1
-          },
-          "마찰 전기 학습 완료!"
-        );
-      }
-    }
-
-
-    function resetStaticLab(){
-      setStaticLessonStep(1);
-    }
-
-
-    /* =========================
-   자기 작용
-========================= */
-
-let electromagnetOn=false;
-
-const compassPositions=[
+   }
+
+  }catch(e){}
+
+  renderStats();
+
+ }
+
+
+ function saveChanges(changes){
+
+  const total=
+   changes.total_exp!==undefined
+   ?changes.total_exp
+   :state.total_exp;
+
+  state={
+   ...state,
+   ...changes,
+   total_exp:total,
+   level:Math.min(
+    5,
+    Math.floor(total/200)+1
+   ),
+   last_activity:new Date().toISOString()
+  };
+
+  renderStats();
+  saveState();
+
+ }
+
+
+ function award(key,amount,changes,message){
+
+  if(rewards.has(key))return;
+
+  rewards.add(key);
+
+  saveChanges({
+   ...changes,
+   total_exp:state.total_exp+amount
+  });
+
+  showToast(
+   "+"+amount+" EXP · "+message
+  );
+
+ }
+
+
+ function showView(id){
+
+  document
+   .querySelectorAll(".view")
+   .forEach(view=>
+    view.classList.toggle(
+     "active",
+     view.id===id
+    )
+   );
+
+
+  window.scrollTo({
+   top:0,
+   behavior:"smooth"
+  });
+
+
+  if(id==="generation"){
+   resetStaticLab();
+  }
+
+
+  if(id==="energy"){
+   setupRandomQuiz();
+   resetCircuitBuilder();
+  }
+
+
+  if(id==="magnet"){
+
+   electromagnetOn=false;
+
+   updateElectromagnetUI();
+
+  }
+
+
+  if(id==="exam"){
+   loadExamState();
+   renderExam();
+  }
+
+ }
+
+
+ /* =========================
+    전기의 발생
+ ========================= */
+
+ let staticLessonStep=1;
+
+
+ const staticLessonData={
+
+  1:{
+   title:"마찰 전 · 전기적으로 중성",
+   caption:"마찰하기 전에는 두 물체의 (+)전하와 (−)전하가 균형을 이루어 전기적으로 중성입니다."
+  },
+
+  2:{
+   title:"마찰 시작 · 전자가 움직일 준비",
+   caption:"두 물체를 마찰하면 전자가 한 물체에서 다른 물체로 이동할 수 있습니다."
+  },
+
+  3:{
+   title:"마찰 중 · 전자 이동",
+   caption:"이 실험에서는 털가죽의 전자가 빨대로 이동합니다."
+  },
+
+  4:{
+   title:"마찰 후 · 빨대는 −, 털가죽은 +",
+   caption:"빨대는 전자를 얻어 (−)전하를 띠고, 털가죽은 전자를 잃어 (+)전하를 띱니다."
+  }
+
+ };
+
+
+ const baseChargePattern=[
+
+  ['plus',12,18],
+  ['minus',30,18],
+  ['plus',48,18],
+  ['minus',66,18],
+  ['plus',84,18],
+
+  ['minus',21,38],
+  ['plus',39,38],
+  ['minus',57,38],
+  ['plus',75,38],
+
+  ['plus',12,60],
+  ['minus',30,60],
+  ['plus',48,60],
+  ['minus',66,60],
+  ['plus',84,60],
+
+  ['minus',21,80],
+  ['plus',39,80],
+  ['minus',57,80],
+  ['plus',75,80]
+
+ ];
+
+
+ function addParticle(
+  container,
+  sign,
+  x,
+  y,
+  moving=false
+ ){
+
+  const e=document.createElement("div");
+
+  e.className=
+   "charge-particle "+
+   sign+
+   (moving?" moving":"");
+
+  e.textContent=
+   sign==="minus"
+   ?"−"
+   :"+";
+
+  e.style.left=x+"%";
+  e.style.top=y+"%";
+
+  container.appendChild(e);
+
+  return e;
+
+ }
+
+
+ function renderCharges(
+  containerId,
+  type,
+  extraSign=null,
+  extraCount=0,
+  movingMinus=false
+ ){
+
+  const container=
+   document.getElementById(containerId);
+
+  if(!container)return;
+
+  container.innerHTML="";
+
+  const scale=
+   type==="straw"
+   ?0.82
+   :1;
+
+  const xOffset=
+   type==="straw"
+   ?8
+   :0;
+
+
+  baseChargePattern.forEach(
+   ([sign,x,y])=>{
+
+    addParticle(
+     container,
+     sign,
+     xOffset+x*scale,
+     y,
+     movingMinus&&sign==="minus"
+    );
+
+   }
+  );
+
+
+  if(extraSign&&extraCount){
+
+   const extraPositions=[
+    [18,28],
+    [36,48],
+    [54,28],
+    [72,48],
+    [88,28]
+   ];
+
+
+   for(
+    let i=0;
+    i<extraCount;
+    i++
+   ){
+
+    const pos=
+     extraPositions[
+      i%extraPositions.length
+     ];
+
+    const x=
+     type==="straw"
+     ?10+pos[0]*.82
+     :pos[0];
+
+    addParticle(
+     container,
+     extraSign,
+     x,
+     pos[1],
+     false
+    );
+
+   }
+
+  }
+
+ }
+
+
+ function animateElectronsToStraw(){
+
+  const fur=
+   document.getElementById(
+    "fur-particles"
+   );
+
+  const straw=
+   document.getElementById(
+    "straw-particles"
+   );
+
+  fur.innerHTML="";
+  straw.innerHTML="";
+
+
+  renderCharges(
+   "fur-particles",
+   "fur",
+   null,
+   0,
+   true
+  );
+
+
+  renderCharges(
+   "straw-particles",
+   "straw"
+  );
+
+
+  const movers=[];
+
+
+  [0,1,2,3,4].forEach(
+   i=>{
+
+    const e=
+     addParticle(
+      fur,
+      "minus",
+      64,
+      18+i*15,
+      false
+     );
+
+    movers.push(e);
+
+
+    requestAnimationFrame(
+     ()=>{
+
+      e.style.transition=
+       "transform 1.2s ease "+
+       i*.1+
+       "s,left 1.2s ease "+
+       i*.1+
+       "s";
+
+      e.style.transform=
+       "translate(245px,"+
+       (i-2)*7+
+       "px)";
+
+      e.style.left="94%";
+
+     }
+    );
+
+   }
+  );
+
+
+  setTimeout(
+   ()=>{
+
+    movers.forEach(
+     e=>e.remove()
+    );
+
+
+    renderCharges(
+     "fur-particles",
+     "fur",
+     "plus",
+     5,
+     false
+    );
+
+
+    renderCharges(
+     "straw-particles",
+     "straw",
+     "minus",
+     5,
+     false
+    );
+
+   },
+   1900
+  );
+
+ }
+
+
+ function setStaticLessonStep(step){
+
+  staticLessonStep=step;
+
+  const data=
+   staticLessonData[step];
+
+
+  document.getElementById(
+   "static-step-number"
+  ).textContent=step;
+
+
+  document.getElementById(
+   "static-step-title"
+  ).textContent=data.title;
+
+
+  document.getElementById(
+   "static-step-caption"
+  ).textContent=data.caption;
+
+
+  document
+   .querySelectorAll(
+    ".static-lesson-dot"
+   )
+   .forEach(
+    (b,i)=>
+     b.classList.toggle(
+      "active",
+      i===step-1
+     )
+   );
+
+
+  document.getElementById(
+   "static-next-btn"
+  ).textContent=
+   step===4
+   ?"처음부터 다시 ↺"
+   :"다음 단계 →";
+
+
+  const strawCharge=
+   document.getElementById(
+    "straw-charge"
+   );
+
+
+  const furCharge=
+   document.getElementById(
+    "fur-charge"
+   );
+
+
+  if(step===1){
+
+   strawCharge.textContent=
+    "중성 · (+)와 (−)가 같음";
+
+   furCharge.textContent=
+    "중성 · (+)와 (−)가 같음";
+
+
+   renderCharges(
+    "fur-particles",
+    "fur"
+   );
+
+
+   renderCharges(
+    "straw-particles",
+    "straw"
+   );
+
+  }else if(step===2){
+
+   strawCharge.textContent=
+    "중성 · 아직 균형";
+
+   furCharge.textContent=
+    "중성 · 아직 균형";
+
+
+   renderCharges(
+    "fur-particles",
+    "fur",
+    null,
+    0,
+    true
+   );
+
+
+   renderCharges(
+    "straw-particles",
+    "straw"
+   );
+
+  }else if(step===3){
+
+   strawCharge.textContent=
+    "전자(−)가 들어오는 중";
+
+   furCharge.textContent=
+    "전자(−)가 빠져나가는 중";
+
+
+   animateElectronsToStraw();
+
+  }else{
+
+   strawCharge.textContent=
+    "−전하 · (−)가 더 많음";
+
+   furCharge.textContent=
+    "+전하 · (+)가 더 많음";
+
+
+   renderCharges(
+    "fur-particles",
+    "fur",
+    "plus",
+    5,
+    false
+   );
+
+
+   renderCharges(
+    "straw-particles",
+    "straw",
+    "minus",
+    5,
+    false
+   );
+
+  }
+
+ }
+
+
+ function nextStaticLesson(){
+
+  if(staticLessonStep===4){
+
+   setStaticLessonStep(1);
+
+   return;
+  }
+
+
+  const next=
+   staticLessonStep+1;
+
+
+  setStaticLessonStep(next);
+
+
+  if(next===4){
+
+   award(
+    "static",
+    80,
+    {
+     completed_concepts:
+      state.completed_concepts+1
+    },
+    "마찰 전기 학습 완료!"
+   );
+
+  }
+
+ }
+
+
+ function resetStaticLab(){
+
+  setStaticLessonStep(1);
+
+ }
+
+
+ /* =========================
+    자기 작용
+ ========================= */
+
+ let electromagnetOn=false;
+
+
+ /*
+  * 나침반 위치
+  *
+  * 순서:
+  * 1  왼쪽 위 바깥
+  * 2  위쪽 왼쪽
+  * 3  위쪽 오른쪽
+  * 4  오른쪽 위 바깥
+  * 5  아래쪽 왼쪽
+  * 6  아래쪽 오른쪽
+  * 7  왼쪽 아래 바깥
+  * 8  오른쪽 아래 바깥
+  * 9  가운데 위
+  * 10 가운데 아래
+  */
+
+ const compassPositions=[
+
   [10,36],
   [33,21],
   [72,21],
   [90,36],
+
   [33,79],
   [72,79],
   [10,64],
   [90,64],
+
   [50,32],
   [50,68]
-];
+
+ ];
 
 
-/*
- * 각 나침반에서 전자석 중심을 바라보는 방향 계산
- *
- * 나침반 기본 방향:
- * 0deg   = 위
- * 90deg  = 오른쪽
- * 180deg = 아래
- * -90deg = 왼쪽
- */
-function compassAngleToMagnet(x,y){
+ /*
+  * =====================================================
+  * 나침반 자기장 방향
+  * =====================================================
+  *
+  * 기존에는 x,y 위치를 이용해 단순한 각도를 계산했습니다.
+  *
+  * 하지만 실제 화면에 그려진 자기장 선은 단순히
+  * 중심을 향하는 직선이 아니기 때문에
+  * 특히 양 끝쪽 나침반에서 방향이 이상하게 보였습니다.
+  *
+  * 그래서 이번에는 각 나침반 위치마다
+  * 화면에 표시된 자기장 곡선에 맞는 방향을 직접 지정합니다.
+  *
+  * CSS 기준:
+  *
+  * 0도   = 위
+  * 90도  = 오른쪽
+  * 180도 = 아래
+  * -90도 = 왼쪽
+  *
+  * OFF 상태는 모든 나침반이 0도입니다.
+  *
+  * ON 상태에서는 주변 자기장 방향으로 회전합니다.
+  */
 
-  const targetX=50;
-  const targetY=50;
+ const compassAngles=[
 
-  const dx=targetX-x;
-  const dy=targetY-y;
+  /*
+   * 왼쪽 위 바깥
+   * 자기장 선을 따라 왼쪽 아래 방향으로
+   */
+  -145,
 
-  return(
-    Math.atan2(dx,-dy)*
-    180/
-    Math.PI
-  );
-}
+  /*
+   * 위쪽 왼쪽
+   */
+  -115,
+
+  /*
+   * 위쪽 오른쪽
+   */
+  -65,
+
+  /*
+   * 오른쪽 위 바깥
+   */
+  -35,
 
 
-/*
- * 나침반을 처음 한 번만 생성
- */
-function createCompasses(){
+  /*
+   * 아래쪽 왼쪽
+   */
+  115,
+
+  /*
+   * 아래쪽 오른쪽
+   */
+  65,
+
+  /*
+   * 왼쪽 아래 바깥
+   */
+   145,
+
+  /*
+   * 오른쪽 아래 바깥
+   */
+   35,
+
+
+  /*
+   * 가운데 위
+   * 이전에 수정해서 정상적으로 보이던 방향 유지
+   */
+   -90,
+
+  /*
+   * 가운데 아래
+   * 이전에 수정해서 정상적으로 보이던 방향 유지
+   */
+    90
+
+ ];
+
+
+ /*
+  * 기존 함수 이름을 유지합니다.
+  *
+  * 이제는 위치 계산을 하지 않고
+  * 해당 나침반의 번호를 이용해서
+  * 미리 정해둔 방향을 반환합니다.
+  */
+ function compassFieldAngle(index){
+
+  if(
+   index<0 ||
+   index>=compassAngles.length
+  ){
+
+   return 0;
+
+  }
+
+  return compassAngles[index];
+
+ }
+
+
+ /*
+  * 나침반 DOM은 한 번만 생성합니다.
+  *
+  * 버튼을 누를 때마다 DOM을 삭제하고 다시 만들면
+  * CSS transition이 적용되지 않습니다.
+  *
+  * 따라서 최초 1회만 만들고,
+  * 이후에는 transform만 변경합니다.
+  */
+ function createCompasses(){
 
   const layer=
-    document.getElementById(
-      "compass-needles"
-    );
+   document.getElementById(
+    "compass-needles"
+   );
 
   if(!layer)return;
 
+
   if(
-    layer.children.length===
-    compassPositions.length
+   layer.children.length===
+   compassPositions.length
   ){
-    return;
+
+   return;
+
   }
+
 
   layer.innerHTML="";
 
+
   compassPositions.forEach(
-    ([x,y],index)=>{
+   ([x,y],index)=>{
 
-      const holder=
-        document.createElement(
-          "div"
-        );
+    const holder=
+     document.createElement(
+      "div"
+     );
 
-      holder.className=
-        "compass-holder";
-
-      holder.style.left=
-        x+"%";
-
-      holder.style.top=
-        y+"%";
+    holder.className=
+     "compass-holder";
 
 
-      const body=
-        document.createElement(
-          "div"
-        );
+    holder.style.left=
+     x+"%";
 
-      body.className=
-        "compass-body";
+    holder.style.top=
+     y+"%";
 
 
-      const needle=
-        document.createElement(
-          "div"
-        );
+    const body=
+     document.createElement(
+      "div"
+     );
 
-      needle.className=
-        "compass-needle";
-
-
-      const north=
-        document.createElement(
-          "div"
-        );
-
-      north.className=
-        "compass-north";
+    body.className=
+     "compass-body";
 
 
-      const south=
-        document.createElement(
-          "div"
-        );
+    const needle=
+     document.createElement(
+      "div"
+     );
 
-      south.className=
-        "compass-south";
-
-
-      needle.append(
-        north,
-        south
-      );
-
-      body.appendChild(
-        needle
-      );
-
-      holder.appendChild(
-        body
-      );
+    needle.className=
+     "compass-needle";
 
 
-      holder.dataset.index=
-        index;
+    /*
+     * 빨간색 = N극
+     */
+    const north=
+     document.createElement(
+      "div"
+     );
 
-      holder.dataset.x=
-        x;
-
-      holder.dataset.y=
-        y;
+    north.className=
+     "compass-north";
 
 
-      layer.appendChild(
-        holder
-      );
+    /*
+     * 파란색 = S극
+     */
+    const south=
+     document.createElement(
+      "div"
+     );
 
-    }
+    south.className=
+     "compass-south";
+
+
+    needle.append(
+     north,
+     south
+    );
+
+
+    body.appendChild(
+     needle
+    );
+
+
+    holder.appendChild(
+     body
+    );
+
+
+    /*
+     * 나침반 번호 저장
+     */
+    holder.dataset.index=
+     index;
+
+
+    layer.appendChild(
+     holder
+    );
+
+   }
   );
-}
+
+ }
 
 
-/*
- * 전자석 상태에 따라 나침반 방향 변경
- */
-function updateCompassNeedles(){
+ function updateCompassNeedles(){
 
   const layer=
-    document.getElementById(
-      "compass-needles"
-    );
+   document.getElementById(
+    "compass-needles"
+   );
 
   if(!layer)return;
 
+
+  /*
+   * 혹시 나침반이 아직 생성되지 않았다면 생성
+   */
   createCompasses();
 
 
   const holders=
-    layer.querySelectorAll(
-      ".compass-holder"
-    );
+   layer.querySelectorAll(
+    ".compass-holder"
+   );
 
 
   holders.forEach(
-    holder=>{
+   holder=>{
 
-      const index=
-        Number(
-          holder.dataset.index
-        );
-
-      const x=
-        Number(
-          holder.dataset.x
-        );
-
-      const y=
-        Number(
-          holder.dataset.y
-        );
+    const index=
+     Number(
+      holder.dataset.index
+     );
 
 
-      const needle=
-        holder.querySelector(
-          ".compass-needle"
-        );
+    const needle=
+     holder.querySelector(
+      ".compass-needle"
+     );
 
-      if(!needle)return;
-
-
-      /*
-       * 전자석 OFF:
-       * 모든 나침반이 위쪽
-       */
-      let angle=0;
+    if(!needle)return;
 
 
-      if(electromagnetOn){
-
-        /*
-         * 바깥쪽 8개:
-         * 전자석 중심을 바라봄
-         */
-        if(index<8){
-
-          angle=
-            compassAngleToMagnet(
-              x,
-              y
-            );
-
-        }
+    /*
+     * OFF:
+     * 모든 나침반이 위쪽
+     */
+    let angle=0;
 
 
-        /*
-         * 가운데 위:
-         * 왼쪽을 바라봄
-         */
-        else if(index===8){
+    /*
+     * ON:
+     * 각 위치에 맞는 자기장 방향
+     */
+    if(electromagnetOn){
 
-          angle=-90;
-
-        }
-
-
-        /*
-         * 가운데 아래:
-         * 오른쪽을 바라봄
-         */
-        else if(index===9){
-
-          angle=90;
-
-        }
-
-      }
-
-
-      needle.style.transform=
-        "translate(-50%,-50%) rotate("+
-        angle+
-        "deg)";
+     angle=
+      compassFieldAngle(
+       index
+      );
 
     }
+
+
+    /*
+     * 나침반 중심을 유지하면서 회전
+     */
+    needle.style.transform=
+     "translate(-50%,-50%) rotate("+
+     angle+
+     "deg)";
+
+   }
   );
-}
+
+ }
 
 
-/*
- * 기존 코드에서 renderCompasses()를
- * 호출해도 작동하도록 유지
- */
-function renderCompasses(){
+ /*
+  * 기존 함수 이름 유지
+  */
+ function renderCompasses(){
 
   createCompasses();
 
   updateCompassNeedles();
 
-}
+ }
 
 
-function updateElectromagnetUI(){
+ function updateElectromagnetUI(){
 
   const btn=
-    document.getElementById(
-      "electromagnet-toggle"
-    );
+   document.getElementById(
+    "electromagnet-toggle"
+   );
 
   const stateEl=
-    document.getElementById(
-      "electromagnet-state"
-    );
+   document.getElementById(
+    "electromagnet-state"
+   );
 
   const field=
-    document.getElementById(
-      "field-lines"
-    );
+   document.getElementById(
+    "field-lines"
+   );
 
   const graphic=
-    document.getElementById(
-      "electromagnet-graphic"
-    );
+   document.getElementById(
+    "electromagnet-graphic"
+   );
 
 
   if(!btn||!stateEl)return;
 
 
   btn.textContent=
-    electromagnetOn
-    ?"전자석 끄기"
-    :"전자석 켜기";
+   electromagnetOn
+   ?"전자석 끄기"
+   :"전자석 켜기";
 
 
   btn.classList.toggle(
-    "bg-yellow-300",
-    electromagnetOn
+   "bg-yellow-300",
+   electromagnetOn
   );
 
+
   btn.classList.toggle(
-    "text-[#07112b]",
-    electromagnetOn
+   "text-[#07112b]",
+   electromagnetOn
   );
 
 
   stateEl.textContent=
-    electromagnetOn
-    ?"전자석 켜짐 · 나침반이 자기장 방향을 가리킴"
-    :"전자석 꺼짐 · 나침반은 위쪽을 가리킴";
+   electromagnetOn
+   ?"전자석 켜짐 · 나침반이 자기장 방향을 가리킴"
+   :"전자석 꺼짐 · 나침반은 위쪽을 가리킴";
 
 
   if(field){
 
-    field.style.opacity=
-      electromagnetOn
-      ?".55"
-      :".12";
+   field.style.opacity=
+    electromagnetOn
+    ?".55"
+    :".12";
 
   }
 
 
   if(graphic){
 
-    graphic.style.filter=
-      electromagnetOn
-      ?"drop-shadow(0 0 12px rgba(248,239,86,.35))"
-      :"none";
+   graphic.style.filter=
+    electromagnetOn
+    ?"drop-shadow(0 0 12px rgba(248,239,86,.35))"
+    :"none";
 
   }
 
 
   updateCompassNeedles();
 
-}
+ }
 
 
-function toggleElectromagnet(){
+ function toggleElectromagnet(){
 
   electromagnetOn=
-    !electromagnetOn;
+   !electromagnetOn;
 
   updateElectromagnetUI();
 
-}
+ }
 
 
-    /* =========================
-       회로
-    ========================= */
+ /* =========================
+    회로
+ ========================= */
 
-    let circuitPlaced=new Map();
-    let draggedPiece=null;
-    let placementSeq=0;
+ let circuitPlaced=new Map();
 
+ let draggedPiece=null;
 
-    const pieceInfo={
-      battery:{
-        label:"전지",
-        icon:"battery-charging",
-        type:"source"
-      },
-      bulb:{
-        label:"전구",
-        icon:"lightbulb",
-        type:"load"
-      },
-      switch:{
-        label:"스위치",
-        icon:"toggle-right",
-        type:"switch"
-      },
-      wire:{
-        label:"전선",
-        icon:"cable",
-        type:"wire"
-      },
-      resistor:{
-        label:"저항",
-        icon:"rectangle-horizontal",
-        type:"resistor"
-      },
-      motor:{
-        label:"모터",
-        icon:"fan",
-        type:"motor"
-      },
-      ammeter:{
-        label:"전류계",
-        icon:"gauge",
-        type:"ammeter"
-      },
-      voltmeter:{
-        label:"전압계",
-        icon:"gauge-circle",
-        type:"voltmeter"
-      }
-    };
+ let placementSeq=0;
 
 
-    function dragPiece(event){
+ const pieceInfo={
 
-      draggedPiece=
-        event.currentTarget.dataset.piece;
+  battery:{
+   label:"전지",
+   icon:"battery-charging",
+   type:"source"
+  },
 
-      event.dataTransfer.effectAllowed=
-        "copy";
+  bulb:{
+   label:"전구",
+   icon:"lightbulb",
+   type:"load"
+  },
 
-      event.dataTransfer.setData(
-        "text/plain",
-        draggedPiece
-      );
+  switch:{
+   label:"스위치",
+   icon:"toggle-right",
+   type:"switch"
+  },
+
+  wire:{
+   label:"전선",
+   icon:"cable",
+   type:"wire"
+  },
+
+  resistor:{
+   label:"저항",
+   icon:"rectangle-horizontal",
+   type:"resistor"
+  },
+
+  motor:{
+   label:"모터",
+   icon:"fan",
+   type:"motor"
+  },
+
+  ammeter:{
+   label:"전류계",
+   icon:"gauge",
+   type:"ammeter"
+  },
+
+  voltmeter:{
+   label:"전압계",
+   icon:"gauge-circle",
+   type:"voltmeter"
+  }
+
+ };
+
+
+ function dragPiece(event){
+
+  draggedPiece=
+   event.currentTarget.dataset.piece;
+
+  event.dataTransfer.effectAllowed=
+   "copy";
+
+  event.dataTransfer.setData(
+   "text/plain",
+   draggedPiece
+  );
+
+ }
+
+
+ function allowCircuitDrop(event){
+
+  event.preventDefault();
+
+  event.dataTransfer.dropEffect=
+   "copy";
+
+  event.currentTarget.classList.add(
+   "dragover"
+  );
+
+ }
+
+
+ function dropCircuitPiece(event){
+
+  event.preventDefault();
+
+  const zone=
+   event.currentTarget;
+
+  zone.classList.remove(
+   "dragover"
+  );
+
+
+  let data=
+   event.dataTransfer.getData(
+    "text/plain"
+   )||draggedPiece;
+
+
+  if(data.startsWith("move:")){
+   data=data.slice(5);
+  }
+
+
+  if(!data||!pieceInfo[data])return;
+
+
+  const r=
+   zone.getBoundingClientRect();
+
+
+  const x=
+   Math.max(
+    55,
+    Math.min(
+     r.width-55,
+     event.clientX-r.left
+    )
+   );
+
+
+  const y=
+   Math.max(
+    45,
+    Math.min(
+     r.height-45,
+     event.clientY-r.top
+    )
+   );
+
+
+  placeCircuitPiece(
+   data,
+   x,
+   y
+  );
+
+ }
+
+
+ function placeCircuitPiece(
+  piece,
+  x,
+  y
+ ){
+
+  const zone=
+   document.getElementById(
+    "circuit-dropzone"
+   );
+
+  const info=
+   pieceInfo[piece];
+
+
+  const existing=
+   document.getElementById(
+    "placed-"+piece
+   );
+
+  if(existing)existing.remove();
+
+
+  placementSeq++;
+
+
+  const el=
+   document.createElement(
+    "div"
+   );
+
+  el.id=
+   "placed-"+piece;
+
+  el.className=
+   "placed-piece rounded-xl border border-sky-200/30 bg-[#132752] px-3 py-3 min-w-[88px] text-center shadow-lg";
+
+
+  el.innerHTML=
+   '<i data-lucide="'+
+   info.icon+
+   '" class="w-6 h-6 mx-auto text-yellow-200"></i>'+
+   '<b class="block mt-1 text-sm">'+
+   info.label+
+   "</b>";
+
+
+  el.style.left=x+"px";
+  el.style.top=y+"px";
+  el.dataset.piece=piece;
+  el.draggable=true;
+
+
+  el.addEventListener(
+   "dragstart",
+   dragPlacedPiece
+  );
+
+
+  zone.appendChild(el);
+
+
+  circuitPlaced.set(
+   piece,
+   {
+    x,
+    y,
+    order:placementSeq
+   }
+  );
+
+
+  document.getElementById(
+   "builder-empty-message"
+  ).style.display="none";
+
+
+  lucide.createIcons();
+
+  updateCircuitPreview();
+
+ }
+
+
+ function dragPlacedPiece(event){
+
+  const piece=
+   event.currentTarget.dataset.piece;
+
+  draggedPiece=piece;
+
+  event.dataTransfer.effectAllowed=
+   "move";
+
+  event.dataTransfer.setData(
+   "text/plain",
+   "move:"+piece
+  );
+
+ }
+
+
+ function resetCircuitBuilder(){
+
+  circuitPlaced.clear();
+
+  placementSeq=0;
+
+
+  document
+   .querySelectorAll(
+    "#circuit-dropzone .placed-piece"
+   )
+   .forEach(
+    e=>e.remove()
+   );
+
+
+  document.getElementById(
+   "builder-empty-message"
+  ).style.display="";
+
+
+  document.getElementById(
+   "builder-status"
+  ).textContent=
+   "아직 회로가 완성되지 않았어요.";
+
+
+  const result=
+   document.getElementById(
+    "circuit-result"
+   );
+
+
+  if(result){
+
+   result.classList.remove(
+    "show"
+   );
+
+  }
+
+
+  updateCircuitPreview();
+
+ }
+
+
+ function updateCircuitPreview(){
+
+  const complete=
+   [
+    "battery",
+    "bulb",
+    "switch",
+    "wire"
+   ].every(
+    p=>circuitPlaced.has(p)
+   );
+
+
+  [1,2,3,4].forEach(
+   n=>{
+
+    const path=
+     document.getElementById(
+      "builder-wire-"+n
+     );
+
+    if(!path)return;
+
+
+    path.setAttribute(
+     "stroke",
+     complete
+     ?"#f8ef56"
+     :"#355d88"
+    );
+
+   }
+  );
+
+ }
+
+
+ function createSvgEl(
+  tag,
+  attrs={},
+  text=""
+ ){
+
+  const el=
+   document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    tag
+   );
+
+
+  Object.entries(attrs)
+   .forEach(
+    ([k,v])=>
+     el.setAttribute(
+      k,
+      String(v)
+     )
+   );
+
+
+  if(text){
+   el.textContent=text;
+  }
+
+
+  return el;
+
+ }
+
+
+ function drawSchematicComponent(
+  svg,
+  piece,
+  x,
+  y
+ ){
+
+  const g=
+   createSvgEl(
+    "g",
+    {
+     transform:
+      `translate(${x} ${y})`
     }
+   );
 
 
-    function allowCircuitDrop(event){
+  const info=
+   pieceInfo[piece];
 
-      event.preventDefault();
 
-      event.dataTransfer.dropEffect=
-        "copy";
-
-      event.currentTarget.classList.add(
-        "dragover"
-      );
+  svg.appendChild(
+   createSvgEl(
+    "circle",
+    {
+     cx:x-34,
+     cy:y,
+     r:4,
+     class:"result-terminal"
     }
+   )
+  );
 
 
-    function dropCircuitPiece(event){
-
-      event.preventDefault();
-
-      const zone=
-        event.currentTarget;
-
-      zone.classList.remove(
-        "dragover"
-      );
-
-
-      let data=
-        event.dataTransfer.getData(
-          "text/plain"
-        )||draggedPiece;
-
-
-      if(data.startsWith("move:")){
-        data=data.slice(5);
-      }
-
-      if(!data||!pieceInfo[data])return;
-
-
-      const r=
-        zone.getBoundingClientRect();
-
-
-      const x=
-        Math.max(
-          55,
-          Math.min(
-            r.width-55,
-            event.clientX-r.left
-          )
-        );
-
-
-      const y=
-        Math.max(
-          45,
-          Math.min(
-            r.height-45,
-            event.clientY-r.top
-          )
-        );
-
-
-      placeCircuitPiece(
-        data,
-        x,
-        y
-      );
+  svg.appendChild(
+   createSvgEl(
+    "circle",
+    {
+     cx:x+34,
+     cy:y,
+     r:4,
+     class:"result-terminal"
     }
+   )
+  );
 
 
-    function placeCircuitPiece(
-      piece,
-      x,
-      y
-    ){
+  if(piece==="battery"){
 
-      const zone=
-        document.getElementById(
-          "circuit-dropzone"
-        );
-
-      const info=
-        pieceInfo[piece];
-
-
-      const existing=
-        document.getElementById(
-          "placed-"+piece
-        );
-
-      if(existing)existing.remove();
+   g.appendChild(
+    createSvgEl(
+     "line",
+     {
+      x1:-10,
+      y1:-22,
+      x2:-10,
+      y2:22,
+      class:"result-symbol"
+     }
+    )
+   );
 
 
-      placementSeq++;
+   g.appendChild(
+    createSvgEl(
+     "line",
+     {
+      x1:10,
+      y1:-12,
+      x2:10,
+      y2:12,
+      class:"result-symbol"
+     }
+    )
+   );
+
+  }else if(piece==="bulb"){
+
+   g.appendChild(
+    createSvgEl(
+     "circle",
+     {
+      cx:0,
+      cy:0,
+      r:18,
+      class:"result-bulb"
+     }
+    )
+   );
 
 
-      const el=
-        document.createElement(
-          "div"
-        );
+   g.appendChild(
+    createSvgEl(
+     "path",
+     {
+      d:"M-8 9 L8 -9 M-8 -9 L8 9",
+      class:"result-bulb"
+     }
+    )
+   );
 
-      el.id=
-        "placed-"+piece;
+  }else if(piece==="switch"){
 
-      el.className=
-        "placed-piece rounded-xl border border-sky-200/30 bg-[#132752] px-3 py-3 min-w-[88px] text-center shadow-lg";
-
-
-      el.innerHTML=
-        '<i data-lucide="'+
-        info.icon+
-        '" class="w-6 h-6 mx-auto text-yellow-200"></i>'+
-        '<b class="block mt-1 text-sm">'+
-        info.label+
-        "</b>";
-
-
-      el.style.left=x+"px";
-      el.style.top=y+"px";
-      el.dataset.piece=piece;
-      el.draggable=true;
+   g.appendChild(
+    createSvgEl(
+     "circle",
+     {
+      cx:-18,
+      cy:10,
+      r:4,
+      fill:"#f8ef56"
+     }
+    )
+   );
 
 
-      el.addEventListener(
-        "dragstart",
-        dragPlacedPiece
-      );
+   g.appendChild(
+    createSvgEl(
+     "circle",
+     {
+      cx:18,
+      cy:-10,
+      r:4,
+      fill:"#f8ef56"
+     }
+    )
+   );
 
 
-      zone.appendChild(el);
+   g.appendChild(
+    createSvgEl(
+     "line",
+     {
+      x1:-18,
+      y1:10,
+      x2:16,
+      y2:-8,
+      class:"result-symbol"
+     }
+    )
+   );
+
+  }else if(piece==="wire"){
+
+   g.appendChild(
+    createSvgEl(
+     "line",
+     {
+      x1:-28,
+      y1:0,
+      x2:28,
+      y2:0,
+      class:"result-wire-plain"
+     }
+    )
+   );
+
+  }else{
+
+   g.appendChild(
+    createSvgEl(
+     "circle",
+     {
+      cx:0,
+      cy:0,
+      r:20,
+      class:"result-symbol"
+     }
+    )
+   );
 
 
-      circuitPlaced.set(
-        piece,
-        {
-          x,
-          y,
-          order:placementSeq
-        }
-      );
+   g.appendChild(
+    createSvgEl(
+     "text",
+     {
+      x:0,
+      y:7,
+      fill:"#eaf7ff",
+      "font-size":18,
+      "font-weight":800,
+      "text-anchor":"middle"
+     },
+     piece==="motor"
+     ?"M"
+     :piece==="ammeter"
+     ?"A"
+     :"V"
+    )
+   );
+
+  }
 
 
-      document.getElementById(
-        "builder-empty-message"
-      ).style.display="none";
+  g.appendChild(
+   createSvgEl(
+    "text",
+    {
+     x:0,
+     y:52,
+     class:"result-label"
+    },
+    info.label
+   )
+  );
 
 
-      lucide.createIcons();
+  svg.appendChild(g);
 
-      updateCircuitPreview();
+ }
+
+
+ function circuitJudgement(){
+
+  const has=
+   p=>circuitPlaced.has(p);
+
+
+  const traps=
+   [
+    "resistor",
+    "motor",
+    "ammeter",
+    "voltmeter"
+   ].filter(has);
+
+
+  const missing=
+   [
+    "battery",
+    "bulb",
+    "switch",
+    "wire"
+   ].filter(
+    p=>!has(p)
+   );
+
+
+  if(
+   missing.length===0&&
+   traps.length===0
+  ){
+
+   return{
+    ok:true,
+    text:
+     "정답이에요! 전지·스위치·전구·전선이 모두 들어 있습니다. ⚡"
+   };
+
+  }
+
+
+  const reasons=[];
+
+
+  if(missing.length){
+
+   reasons.push(
+    "필수 부품 부족: "+
+    missing
+     .map(
+      p=>pieceInfo[p].label
+     )
+     .join(", ")
+   );
+
+  }
+
+
+  if(traps.length){
+
+   reasons.push(
+    "필요하지 않은 부품 포함: "+
+    traps
+     .map(
+      p=>pieceInfo[p].label
+     )
+     .join(", ")
+   );
+
+  }
+
+
+  return{
+   ok:false,
+   text:
+    "틀렸어요. "+
+    reasons.join(" · ")
+  };
+
+ }
+
+
+ function drawCircuitResult(){
+
+  const svg=
+   document.getElementById(
+    "circuit-result-svg"
+   );
+
+
+  const result=
+   document.getElementById(
+    "circuit-result-judgement"
+   );
+
+
+  const legend=
+   document.getElementById(
+    "schematic-legend"
+   );
+
+
+  if(!svg)return;
+
+
+  svg.innerHTML="";
+
+
+  const items=
+   [...circuitPlaced.entries()]
+    .sort(
+     (a,b)=>
+      a[1].order-
+      b[1].order
+    );
+
+
+  const parts=
+   items.filter(
+    ([p])=>p!=="wire"
+   );
+
+
+  const wireCount=
+   items.filter(
+    ([p])=>p==="wire"
+   ).length;
+
+
+  if(!parts.length)return;
+
+
+  const layout=[
+
+   {x:150,y:90},
+   {x:400,y:90},
+   {x:650,y:90},
+   {x:650,y:310},
+   {x:400,y:310},
+   {x:150,y:310}
+
+  ];
+
+
+  const points=[];
+
+
+  parts.forEach(
+   ([piece],i)=>{
+
+    points.push({
+     piece,
+     x:
+      layout[
+       i%layout.length
+      ].x,
+     y:
+      layout[
+       i%layout.length
+      ].y
+    });
+
+   }
+  );
+
+
+  function connect(a,b){
+
+   const ax=
+    a.x+
+    (
+     b.x>=a.x
+     ?34
+     :-34
+    );
+
+
+   const bx=
+    b.x+
+    (
+     b.x>=a.x
+     ?-34
+     :34
+    );
+
+
+   if(
+    Math.abs(a.y-b.y)<2
+   ){
+
+    return(
+     `M ${ax} ${a.y} H ${bx}`
+    );
+
+   }
+
+
+   const mx=
+    (ax+bx)/2;
+
+
+   return(
+    `M ${ax} ${a.y} `+
+    `H ${mx} `+
+    `V ${b.y} `+
+    `H ${bx}`
+   );
+
+  }
+
+
+  if(points.length>1){
+
+   points.forEach(
+    (p,i)=>{
+
+     svg.appendChild(
+      createSvgEl(
+       "path",
+       {
+        d:connect(
+         p,
+         points[
+          (i+1)%
+          points.length
+         ]
+        ),
+        class:"result-wire-plain"
+       }
+      )
+     );
+
     }
+   );
 
+  }
 
-    function dragPlacedPiece(event){
 
-      const piece=
-        event.currentTarget.dataset.piece;
+  points.forEach(
+   p=>
+    drawSchematicComponent(
+     svg,
+     p.piece,
+     p.x,
+     p.y
+    )
+  );
 
-      draggedPiece=piece;
 
-      event.dataTransfer.effectAllowed=
-        "move";
+  const verdict=
+   circuitJudgement();
 
-      event.dataTransfer.setData(
-        "text/plain",
-        "move:"+piece
-      );
-    }
 
+  if(result){
 
-    function resetCircuitBuilder(){
+   result.textContent=
+    verdict.text;
 
-      circuitPlaced.clear();
-      placementSeq=0;
+   result.style.color=
+    verdict.ok
+    ?"#74f7bf"
+    :"#ff9fb0";
 
-      document
-        .querySelectorAll(
-          "#circuit-dropzone .placed-piece"
-        )
-        .forEach(
-          e=>e.remove()
-        );
+  }
 
 
-      document.getElementById(
-        "builder-empty-message"
-      ).style.display="";
+  if(legend){
 
+   legend.innerHTML=
+    `<span class="schematic-chip">자동 정렬</span>`+
+    `<span class="schematic-chip">부품 ${parts.length}개</span>`+
+    `<span class="schematic-chip">전선 ${wireCount}개</span>`;
 
-      document.getElementById(
-        "builder-status"
-      ).textContent=
-        "아직 회로가 완성되지 않았어요.";
+  }
 
+ }
 
-      const result=
-        document.getElementById(
-          "circuit-result"
-        );
 
-      if(result){
-        result.classList.remove(
-          "show"
-        );
-      }
+ function checkCircuitBuilder(){
 
+  if(circuitPlaced.size===0){
 
-      updateCircuitPreview();
-    }
+   document.getElementById(
+    "builder-status"
+   ).textContent=
+    "부품을 하나 이상 배치한 뒤 확인해 주세요.";
 
+   return;
 
-    function updateCircuitPreview(){
+  }
 
-      const complete=
-        [
-          "battery",
-          "bulb",
-          "switch",
-          "wire"
-        ].every(
-          p=>circuitPlaced.has(p)
-        );
 
+  drawCircuitResult();
 
-      [1,2,3,4].forEach(
-        n=>{
 
-          const path=
-            document.getElementById(
-              "builder-wire-"+n
-            );
+  document.getElementById(
+   "circuit-result"
+  ).classList.add("show");
 
-          if(!path)return;
 
-          path.setAttribute(
-            "stroke",
-            complete
-            ?"#f8ef56"
-            :"#355d88"
-          );
-        }
-      );
-    }
+  const verdict=
+   circuitJudgement();
 
 
-    function createSvgEl(
-      tag,
-      attrs={},
-      text=""
-    ){
-
-      const el=
-        document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          tag
-        );
-
-
-      Object.entries(attrs)
-        .forEach(
-          ([k,v])=>
-            el.setAttribute(
-              k,
-              String(v)
-            )
-        );
-
-
-      if(text){
-        el.textContent=text;
-      }
-
-
-      return el;
-    }
-
-
-    function drawSchematicComponent(
-      svg,
-      piece,
-      x,
-      y
-    ){
-
-      const g=
-        createSvgEl(
-          "g",
-          {
-            transform:
-              `translate(${x} ${y})`
-          }
-        );
-
-
-      const info=
-        pieceInfo[piece];
-
-
-      svg.appendChild(
-        createSvgEl(
-          "circle",
-          {
-            cx:x-34,
-            cy:y,
-            r:4,
-            class:"result-terminal"
-          }
-        )
-      );
-
-
-      svg.appendChild(
-        createSvgEl(
-          "circle",
-          {
-            cx:x+34,
-            cy:y,
-            r:4,
-            class:"result-terminal"
-          }
-        )
-      );
-
-
-      if(piece==="battery"){
-
-        g.appendChild(
-          createSvgEl(
-            "line",
-            {
-              x1:-10,
-              y1:-22,
-              x2:-10,
-              y2:22,
-              class:"result-symbol"
-            }
-          )
-        );
-
-        g.appendChild(
-          createSvgEl(
-            "line",
-            {
-              x1:10,
-              y1:-12,
-              x2:10,
-              y2:12,
-              class:"result-symbol"
-            }
-          )
-        );
-
-      }else if(piece==="bulb"){
-
-        g.appendChild(
-          createSvgEl(
-            "circle",
-            {
-              cx:0,
-              cy:0,
-              r:18,
-              class:"result-bulb"
-            }
-          )
-        );
-
-        g.appendChild(
-          createSvgEl(
-            "path",
-            {
-              d:"M-8 9 L8 -9 M-8 -9 L8 9",
-              class:"result-bulb"
-            }
-          )
-        );
-
-      }else if(piece==="switch"){
-
-        g.appendChild(
-          createSvgEl(
-            "circle",
-            {
-              cx:-18,
-              cy:10,
-              r:4,
-              fill:"#f8ef56"
-            }
-          )
-        );
-
-        g.appendChild(
-          createSvgEl(
-            "circle",
-            {
-              cx:18,
-              cy:-10,
-              r:4,
-              fill:"#f8ef56"
-            }
-          )
-        );
-
-        g.appendChild(
-          createSvgEl(
-            "line",
-            {
-              x1:-18,
-              y1:10,
-              x2:16,
-              y2:-8,
-              class:"result-symbol"
-            }
-          )
-        );
-
-      }else if(piece==="wire"){
-
-        g.appendChild(
-          createSvgEl(
-            "line",
-            {
-              x1:-28,
-              y1:0,
-              x2:28,
-              y2:0,
-              class:"result-wire-plain"
-            }
-          )
-        );
-
-      }else{
-
-        g.appendChild(
-          createSvgEl(
-            "circle",
-            {
-              cx:0,
-              cy:0,
-              r:20,
-              class:"result-symbol"
-            }
-          )
-        );
-
-        g.appendChild(
-          createSvgEl(
-            "text",
-            {
-              x:0,
-              y:7,
-              fill:"#eaf7ff",
-              "font-size":18,
-              "font-weight":800,
-              "text-anchor":"middle"
-            },
-            piece==="motor"
-            ?"M"
-            :piece==="ammeter"
-            ?"A"
-            :"V"
-          )
-        );
-      }
-
-
-      g.appendChild(
-        createSvgEl(
-          "text",
-          {
-            x:0,
-            y:52,
-            class:"result-label"
-          },
-          info.label
-        )
-      );
-
-
-      svg.appendChild(g);
-    }
-
-
-    function circuitJudgement(){
-
-      const has=
-        p=>circuitPlaced.has(p);
-
-      const traps=
-        [
-          "resistor",
-          "motor",
-          "ammeter",
-          "voltmeter"
-        ].filter(has);
-
-
-      const missing=
-        [
-          "battery",
-          "bulb",
-          "switch",
-          "wire"
-        ].filter(
-          p=>!has(p)
-        );
-
-
-      if(
-        missing.length===0&&
-        traps.length===0
-      ){
-
-        return{
-          ok:true,
-          text:
-            "정답이에요! 전지·스위치·전구·전선이 모두 들어 있습니다. ⚡"
-        };
-      }
-
-
-      const reasons=[];
-
-
-      if(missing.length){
-
-        reasons.push(
-          "필수 부품 부족: "+
-          missing
-            .map(
-              p=>pieceInfo[p].label
-            )
-            .join(", ")
-        );
-      }
-
-
-      if(traps.length){
-
-        reasons.push(
-          "필요하지 않은 부품 포함: "+
-          traps
-            .map(
-              p=>pieceInfo[p].label
-            )
-            .join(", ")
-        );
-      }
-
-
-      return{
-        ok:false,
-        text:
-          "틀렸어요. "+
-          reasons.join(" · ")
-      };
-    }
-
-
-    function drawCircuitResult(){
-
-      const svg=
-        document.getElementById(
-          "circuit-result-svg"
-        );
-
-      const result=
-        document.getElementById(
-          "circuit-result-judgement"
-        );
-
-      const legend=
-        document.getElementById(
-          "schematic-legend"
-        );
-
-
-      if(!svg)return;
-
-      svg.innerHTML="";
-
-
-      const items=
-        [...circuitPlaced.entries()]
-          .sort(
-            (a,b)=>
-              a[1].order-
-              b[1].order
-          );
-
-
-      const parts=
-        items.filter(
-          ([p])=>p!=="wire"
-        );
-
-
-      const wireCount=
-        items.filter(
-          ([p])=>p==="wire"
-        ).length;
-
-
-      if(!parts.length)return;
-
-
-      const layout=[
-        {x:150,y:90},
-        {x:400,y:90},
-        {x:650,y:90},
-        {x:650,y:310},
-        {x:400,y:310},
-        {x:150,y:310}
-      ];
-
-
-      const points=[];
-
-
-      parts.forEach(
-        ([piece],i)=>{
-          points.push({
-            piece,
-            x:
-              layout[
-                i%layout.length
-              ].x,
-            y:
-              layout[
-                i%layout.length
-              ].y
-          });
-        }
-      );
-
-
-      function connect(a,b){
-
-        const ax=
-          a.x+
-          (
-            b.x>=a.x
-            ?34
-            :-34
-          );
-
-        const bx=
-          b.x+
-          (
-            b.x>=a.x
-            ?-34
-            :34
-          );
-
-
-        if(
-          Math.abs(a.y-b.y)<2
-        ){
-          return(
-            `M ${ax} ${a.y} H ${bx}`
-          );
-        }
-
-
-        const mx=
-          (ax+bx)/2;
-
-
-        return(
-          `M ${ax} ${a.y} `+
-          `H ${mx} `+
-          `V ${b.y} `+
-          `H ${bx}`
-        );
-      }
-
-
-      if(points.length>1){
-
-        points.forEach(
-          (p,i)=>{
-            svg.appendChild(
-              createSvgEl(
-                "path",
-                {
-                  d:connect(
-                    p,
-                    points[
-                      (i+1)%
-                      points.length
-                    ]
-                  ),
-                  class:"result-wire-plain"
-                }
-              )
-            );
-          }
-        );
-      }
-
-
-      points.forEach(
-        p=>
-          drawSchematicComponent(
-            svg,
-            p.piece,
-            p.x,
-            p.y
-          )
-      );
-
-
-      const verdict=
-        circuitJudgement();
-
-
-      if(result){
-
-        result.textContent=
-          verdict.text;
-
-        result.style.color=
-          verdict.ok
-          ?"#74f7bf"
-          :"#ff9fb0";
-      }
-
-
-      if(legend){
-
-        legend.innerHTML=
-          `<span class="schematic-chip">자동 정렬</span>`+
-          `<span class="schematic-chip">부품 ${parts.length}개</span>`+
-          `<span class="schematic-chip">전선 ${wireCount}개</span>`;
-      }
-    }
-
-
-    function checkCircuitBuilder(){
-
-      if(circuitPlaced.size===0){
-
-        document.getElementById(
-          "builder-status"
-        ).textContent=
-          "부품을 하나 이상 배치한 뒤 확인해 주세요.";
-
-        return;
-      }
-
-
-      drawCircuitResult();
-
-      document.getElementById(
-        "circuit-result"
-      ).classList.add("show");
-
-
-      const verdict=
-        circuitJudgement();
-
-
-      document.getElementById(
-        "builder-status"
-      ).textContent=
-        verdict.ok
-        ?"정답! 회로 조건을 만족했어요. ⚡"
-        :"틀렸어요. 하지만 네가 만든 회로도는 그대로 표시했어요.";
-
-
-      if(verdict.ok){
-
-        award(
-          "drag-circuit",
-          100,
-          {
-            completed_experiments:
-              state.completed_experiments+1
-          },
-          "직접 회로 완성!"
-        );
-      }
-    }
-
-
-    /* =========================
-       랜덤 퀴즈
-    ========================= */
-
-    const randomQuizBank=[
-      [
-        "전구에 불이 켜지려면 어떤 조건이 필요할까요?",
-        [
-          "회로가 끊겨 있어야 한다",
-          "회로가 닫혀 있어야 한다",
-          "전선이 하나만 있어야 한다",
-          "스위치가 항상 열려 있어야 한다"
-        ],
-        1,
-        "전류가 흐르려면 닫힌 회로가 필요합니다."
-      ],
-      [
-        "전구 A와 B를 직렬로 연결했다. A가 끊어지면 B는?",
-        [
-          "더 밝아진다",
-          "그대로 켜진다",
-          "꺼진다",
-          "깜빡인다"
-        ],
-        2,
-        "직렬회로는 한 곳이 끊어지면 전체가 끊어집니다."
-      ],
-      [
-        "같은 시간 동안 40 W와 100 W 전기기구를 사용했다. 에너지를 더 많이 소비한 것은?",
-        [
-          "40 W",
-          "100 W",
-          "둘 다 같다",
-          "전선에 따라 결정된다"
-        ],
-        1,
-        "같은 시간이라면 전력이 큰 기구가 더 많은 에너지를 소비합니다."
-      ],
-      [
-        "스위치를 열었을 때 일어나는 일은?",
-        [
-          "전류가 더 많이 흐른다",
-          "회로가 끊어져 전류가 흐르지 않는다",
-          "전압이 2배가 된다",
-          "전구가 더 밝아진다"
-        ],
-        1,
-        "스위치를 열면 회로가 끊어집니다."
-      ],
-      [
-        "60 W 전구를 10초 동안 사용했다. 소비한 전기에너지는?",
-        [
-          "6 J",
-          "60 J",
-          "600 J",
-          "6000 J"
-        ],
-        2,
-        "E=Pt이므로 600 J입니다."
-      ],
-      [
-        "닫힌 회로의 설명으로 옳은 것은?",
-        [
-          "건전지가 2개 필요하다",
-          "전류가 흐를 수 있는 완전한 통로가 연결되어 있다",
-          "스위치가 열려 있다",
-          "전구가 2개 있어야 한다"
-        ],
-        1,
-        "닫힌 회로는 전류가 흐를 수 있는 통로가 연결된 상태입니다."
-      ],
-      [
-        "전구 2개를 직렬로 연결한 회로에서 전구 하나를 제거하면?",
-        [
-          "다른 전구가 더 밝아진다",
-          "다른 전구도 꺼진다",
-          "아무 변화가 없다",
-          "건전지가 하나 더 생긴다"
-        ],
-        1,
-        "전구 하나가 제거되면 회로가 끊어집니다."
-      ],
-      [
-        "200 W 전기기구를 5초 동안 사용했다. 소비한 전기에너지는?",
-        [
-          "40 J",
-          "205 J",
-          "1000 J",
-          "2000 J"
-        ],
-        2,
-        "E=Pt이므로 1000 J입니다."
-      ],
-      [
-        "다음 중 전류의 흐름을 막는 상황은?",
-        [
-          "스위치를 닫는다",
-          "끊어진 전선을 연결한다",
-          "회로의 한 부분이 끊어져 있다",
-          "전지를 연결한다"
-        ],
-        2,
-        "회로가 끊어지면 전류가 흐를 수 없습니다."
-      ],
-      [
-        "100 W와 50 W 기구를 각각 20초 사용했다. 소비한 전기에너지의 차이는?",
-        [
-          "500 J",
-          "1000 J",
-          "1500 J",
-          "2000 J"
-        ],
-        1,
-        "(100-50)×20=1000 J입니다."
-      ]
-    ];
-
-
-    let randomSelected=[];
-    let randomIndex=0;
-    let randomScore=0;
-
-
-    function setupRandomQuiz(){
-
-      const pool=[
-        ...randomQuizBank
-      ];
-
-
-      for(
-        let i=pool.length-1;
-        i>0;
-        i--
-      ){
-
-        const j=
-          Math.floor(
-            Math.random()*
-            (i+1)
-          );
-
-
-        [
-          pool[i],
-          pool[j]
-        ]=[
-          pool[j],
-          pool[i]
-        ];
-      }
-
-
-      randomSelected=
-        pool.slice(0,3);
-
-      randomIndex=0;
-      randomScore=0;
-
-      renderRandomQuiz();
-    }
-
-
-    function renderRandomQuiz(){
-
-      const box=
-        document.getElementById(
-          "random-quiz-content"
-        );
-
-      const scoreEl=
-        document.getElementById(
-          "quiz-score"
-        );
-
-      const q=
-        randomSelected[
-          randomIndex
-        ];
-
-
-      if(!q)return;
-
-
-      scoreEl.textContent=
-        "문제 "+
-        (randomIndex+1)+
-        " / 3";
-
-
-      box.innerHTML=
-        "<p>"+
-        (randomIndex+1)+
-        ". "+
-        q[0]+
-        "</p>"+
-        "<div class=\"random-options\" style=\"display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px\"></div>";
-
-
-      const options=
-        box.querySelector(
-          ".random-options"
-        );
-
-
-      q[1].forEach(
-        (label,index)=>{
-
-          const button=
-            document.createElement(
-              "button"
-            );
-
-          button.type="button";
-
-          button.className=
-            "quiz-option";
-
-          button.textContent=
-            String.fromCharCode(
-              9312+index
-            )+
-            " "+
-            label;
-
-
-          button.addEventListener(
-            "click",
-            ()=>answerRandomQuiz(
-              index,
-              button,
-              q,
-              options
-            )
-          );
-
-
-          options.appendChild(
-            button
-          );
-        }
-      );
-    }
-
-
-    function answerRandomQuiz(
-      choice,
+  document.getElementById(
+   "builder-status"
+  ).textContent=
+   verdict.ok
+   ?"정답! 회로 조건을 만족했어요. ⚡"
+   :"틀렸어요. 하지만 네가 만든 회로도는 그대로 표시했어요.";
+
+
+  if(verdict.ok){
+
+   award(
+    "drag-circuit",
+    100,
+    {
+     completed_experiments:
+      state.completed_experiments+1
+    },
+    "직접 회로 완성!"
+   );
+
+  }
+
+ }
+
+
+ /* =========================
+    랜덤 퀴즈
+ ========================= */
+
+ const randomQuizBank=[
+
+  [
+   "전구에 불이 켜지려면 어떤 조건이 필요할까요?",
+   [
+    "회로가 끊겨 있어야 한다",
+    "회로가 닫혀 있어야 한다",
+    "전선이 하나만 있어야 한다",
+    "스위치가 항상 열려 있어야 한다"
+   ],
+   1,
+   "전류가 흐르려면 닫힌 회로가 필요합니다."
+  ],
+
+  [
+   "전구 A와 B를 직렬로 연결했다. A가 끊어지면 B는?",
+   [
+    "더 밝아진다",
+    "그대로 켜진다",
+    "꺼진다",
+    "깜빡인다"
+   ],
+   2,
+   "직렬회로는 한 곳이 끊어지면 전체가 끊어집니다."
+  ],
+
+  [
+   "같은 시간 동안 40 W와 100 W 전기기구를 사용했다. 에너지를 더 많이 소비한 것은?",
+   [
+    "40 W",
+    "100 W",
+    "둘 다 같다",
+    "전선에 따라 결정된다"
+   ],
+   1,
+   "같은 시간이라면 전력이 큰 기구가 더 많은 에너지를 소비합니다."
+  ],
+
+  [
+   "스위치를 열었을 때 일어나는 일은?",
+   [
+    "전류가 더 많이 흐른다",
+    "회로가 끊어져 전류가 흐르지 않는다",
+    "전압이 2배가 된다",
+    "전구가 더 밝아진다"
+   ],
+   1,
+   "스위치를 열면 회로가 끊어집니다."
+  ],
+
+  [
+   "60 W 전구를 10초 동안 사용했다. 소비한 전기에너지는?",
+   [
+    "6 J",
+    "60 J",
+    "600 J",
+    "6000 J"
+   ],
+   2,
+   "E=Pt이므로 600 J입니다."
+  ],
+
+  [
+   "닫힌 회로의 설명으로 옳은 것은?",
+   [
+    "건전지가 2개 필요하다",
+    "전류가 흐를 수 있는 완전한 통로가 연결되어 있다",
+    "스위치가 열려 있다",
+    "전구가 2개 있어야 한다"
+   ],
+   1,
+   "닫힌 회로는 전류가 흐를 수 있는 통로가 연결된 상태입니다."
+  ],
+
+  [
+   "전구 2개를 직렬로 연결한 회로에서 전구 하나를 제거하면?",
+   [
+    "다른 전구가 더 밝아진다",
+    "다른 전구도 꺼진다",
+    "아무 변화가 없다",
+    "건전지가 하나 더 생긴다"
+   ],
+   1,
+   "전구 하나가 제거되면 회로가 끊어집니다."
+  ],
+
+  [
+   "200 W 전기기구를 5초 동안 사용했다. 소비한 전기에너지는?",
+   [
+    "40 J",
+    "205 J",
+    "1000 J",
+    "2000 J"
+   ],
+   2,
+   "E=Pt이므로 1000 J입니다."
+  ],
+
+  [
+   "다음 중 전류의 흐름을 막는 상황은?",
+   [
+    "스위치를 닫는다",
+    "끊어진 전선을 연결한다",
+    "회로의 한 부분이 끊어져 있다",
+    "전지를 연결한다"
+   ],
+   2,
+   "회로가 끊어지면 전류가 흐를 수 없습니다."
+  ],
+
+  [
+   "100 W와 50 W 기구를 각각 20초 사용했다. 소비한 전기에너지의 차이는?",
+   [
+    "500 J",
+    "1000 J",
+    "1500 J",
+    "2000 J"
+   ],
+   1,
+   "(100-50)×20=1000 J입니다."
+  ]
+
+ ];
+
+
+ let randomSelected=[];
+ let randomIndex=0;
+ let randomScore=0;
+
+
+ function setupRandomQuiz(){
+
+  const pool=[
+   ...randomQuizBank
+  ];
+
+
+  for(
+   let i=pool.length-1;
+   i>0;
+   i--
+  ){
+
+   const j=
+    Math.floor(
+     Math.random()*
+     (i+1)
+    );
+
+
+   [
+    pool[i],
+    pool[j]
+   ]=[
+    pool[j],
+    pool[i]
+   ];
+
+  }
+
+
+  randomSelected=
+   pool.slice(0,3);
+
+  randomIndex=0;
+  randomScore=0;
+
+  renderRandomQuiz();
+
+ }
+
+
+ function renderRandomQuiz(){
+
+  const box=
+   document.getElementById(
+    "random-quiz-content"
+   );
+
+
+  const scoreEl=
+   document.getElementById(
+    "quiz-score"
+   );
+
+
+  const q=
+   randomSelected[
+    randomIndex
+   ];
+
+
+  if(!q)return;
+
+
+  scoreEl.textContent=
+   "문제 "+
+   (randomIndex+1)+
+   " / 3";
+
+
+  box.innerHTML=
+   "<p>"+
+   (randomIndex+1)+
+   ". "+
+   q[0]+
+   "</p>"+
+   "<div class=\"random-options\" style=\"display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px\"></div>";
+
+
+  const options=
+   box.querySelector(
+    ".random-options"
+   );
+
+
+  q[1].forEach(
+   (label,index)=>{
+
+    const button=
+     document.createElement(
+      "button"
+     );
+
+
+    button.type="button";
+
+    button.className=
+     "quiz-option";
+
+    button.textContent=
+     String.fromCharCode(
+      9312+index
+     )+
+     " "+
+     label;
+
+
+    button.addEventListener(
+     "click",
+     ()=>answerRandomQuiz(
+      index,
       button,
       q,
       options
-    ){
-
-      [
-        ...options.children
-      ].forEach(
-        item=>
-          item.disabled=true
-      );
-
-
-      const correct=
-        choice===q[2];
-
-
-      if(correct){
-
-        randomScore++;
-
-        button.classList.add(
-          "correct"
-        );
-
-      }else{
-
-        button.classList.add(
-          "wrong"
-        );
-
-        options.children[
-          q[2]
-        ].classList.add(
-          "correct"
-        );
-      }
-
-
-      const explanation=
-        document.createElement(
-          "div"
-        );
-
-      explanation.className=
-        "quiz-explanation";
-
-
-      explanation.innerHTML=
-        "<strong>"+
-        (
-          correct
-          ?"정답! 🎉"
-          :"오답! ❌"
-        )+
-        "</strong><br>"+
-        q[3];
-
-
-      const next=
-        document.createElement(
-          "button"
-        );
-
-      next.type="button";
-
-      next.className=
-        "quiz-next";
-
-      next.textContent=
-        randomIndex===2
-        ?"결과 보기"
-        :"다음 문제";
-
-
-      next.addEventListener(
-        "click",
-        ()=>{
-          randomIndex++;
-
-          randomIndex<3
-          ?renderRandomQuiz()
-          :finishRandomQuiz();
-        }
-      );
-
-
-      document
-        .getElementById(
-          "random-quiz-content"
-        )
-        .append(
-          explanation,
-          next
-        );
-
-
-      document.getElementById(
-        "quiz-score"
-      ).textContent=
-        "문제 "+
-        (randomIndex+1)+
-        " / 3 · 현재 점수 "+
-        randomScore;
-    }
-
-
-    function finishRandomQuiz(){
-
-      const box=
-        document.getElementById(
-          "random-quiz-content"
-        );
-
-
-      const message=
-        randomScore===3
-        ?"완벽해요! 🎉"
-        :randomScore===2
-        ?"좋아요! 조금만 더 복습해봐요 👍"
-        :"괜찮아요! 해설을 다시 확인해보세요 💪";
-
-
-      box.innerHTML=
-        "<div class=\"quiz-result\">"+
-        message+
-        "<br>최종 점수: "+
-        randomScore+
-        " / 3</div>";
-
-
-      document.getElementById(
-        "quiz-score"
-      ).textContent=
-        "완료 · "+
-        randomScore+
-        " / 3";
-    }
-
-
-    /* =========================
-       최종 시험
-    ========================= */
-
-    const EXAM_STORAGE_KEY=
-      "electroLabExamV2";
-
-    let examState=null;
-
-
-    /*
-     * 100문제 문제은행
-     * 현재 사용 중인 문제들을 그대로 사용합니다.
-     */
-    const examBank=[
-      {"q":"전구에 불이 켜지려면 회로는?","o":["끊어진 회로","닫힌 회로","전선이 하나뿐인 회로","전지가 없는 회로"],"a":1,"e":"전류가 흐르려면 닫힌 회로가 필요합니다."},
-      {"q":"스위치를 열면?","o":["회로가 연결된다","전류가 더 커진다","회로가 끊어진다","전지가 충전된다"],"a":2,"e":"스위치를 열면 전류 통로가 끊어집니다."},
-      {"q":"전지의 주된 역할은?","o":["빛을 직접 내는 것","전기 에너지를 공급하는 것","전류를 측정하는 것","전선을 절연하는 것"],"a":1,"e":"전지는 회로에 전기 에너지를 공급합니다."},
-      {"q":"전선의 주된 역할은?","o":["전류가 흐르는 통로를 제공한다","전압을 항상 0으로 만든다","전지를 대신한다","전구 밝기를 자동 조절한다"],"a":0,"e":"전선은 전류가 흐를 통로를 제공합니다."},
-      {"q":"직렬 회로에서 전구 하나가 끊어지면 다른 전구는?","o":["더 밝아진다","계속 켜진다","꺼진다","전압이 두 배가 된다"],"a":2,"e":"직렬 회로는 한 곳이 끊어지면 전체가 끊어집니다."},
-      {"q":"전구를 직렬로 하나 더 연결하면 각 전구의 전압은 일반적으로?","o":["더 커진다","나뉘어 작아진다","항상 0이 된다","반드시 두 배가 된다"],"a":1,"e":"직렬 연결에서는 전압이 여러 소자에 나뉘어 걸립니다."},
-      {"q":"병렬로 연결한 전구 하나를 빼도 다른 전구가 켜질 수 있는 이유는?","o":["전류가 여러 경로로 흐를 수 있어서","전지가 두 개로 늘어나서","전선이 없어져서","전구의 저항이 0이어서"],"a":0,"e":"병렬 회로에는 여러 전류 경로가 있습니다."},
-      {"q":"전지와 전구만 있고 전선이 없다면 가장 큰 문제는?","o":["전압이 너무 크다","전류 통로가 연결되지 않는다","전구가 자동으로 꺼진다","전지가 자석이 된다"],"a":1,"e":"전선이 없으면 연결된 전류 통로를 만들기 어렵습니다."},
-      {"q":"전류가 흐를 수 있는 완전한 통로는?","o":["닫힌 회로","열린 회로","절연체","전류계"],"a":0,"e":"닫힌 회로는 전류가 흐를 수 있는 연결된 통로입니다."},
-      {"q":"회로를 연결하거나 끊는 기구는?","o":["전구","스위치","전지","저항"],"a":1,"e":"스위치는 회로를 연결하거나 끊습니다."}
-    ];
-
-
-    /*
-     * 10개의 문제를 기본 문제은행으로 사용하고
-     * 100개 문제가 필요한 구조를 유지합니다.
-     */
-    while(examBank.length<100){
-      const base=
-        examBank[
-          (examBank.length-1)%10
-        ];
-
-      examBank.push({
-        ...base
-      });
-    }
-
-
-    function createExamState(){
-
-      const indices=
-        examBank.map(
-          (_,i)=>i
-        );
-
-
-      for(
-        let i=indices.length-1;
-        i>0;
-        i--
-      ){
-
-        const j=
-          Math.floor(
-            Math.random()*
-            (i+1)
-          );
-
-
-        [
-          indices[i],
-          indices[j]
-        ]=[
-          indices[j],
-          indices[i]
-        ];
-      }
-
-
-      return{
-        selected:
-          indices.slice(0,20),
-
-        answers:
-          Array(20).fill(null),
-
-        current:0,
-
-        correct:0,
-
-        graded:false
-      };
-    }
-
-
-    function saveExamState(){
-
-      try{
-
-        localStorage.setItem(
-          EXAM_STORAGE_KEY,
-          JSON.stringify(
-            examState
-          )
-        );
-
-      }catch(e){}
-    }
-
-
-    function loadExamState(){
-
-      try{
-
-        const raw=
-          localStorage.getItem(
-            EXAM_STORAGE_KEY
-          );
-
-
-        if(raw){
-
-          const saved=
-            JSON.parse(raw);
-
-
-          if(
-            saved &&
-            Array.isArray(
-              saved.selected
-            ) &&
-            saved.selected.length===20 &&
-            Array.isArray(
-              saved.answers
-            ) &&
-            saved.answers.length===20
-          ){
-
-            examState={
-              ...saved,
-              current:
-                Number.isInteger(
-                  saved.current
-                )
-                ?Math.max(
-                  0,
-                  Math.min(
-                    19,
-                    saved.current
-                  )
-                )
-                :0,
-
-              correct:
-                Number.isInteger(
-                  saved.correct
-                )
-                ?saved.correct
-                :0,
-
-              graded:
-                Boolean(
-                  saved.graded
-                )
-            };
-
-            return;
-          }
-        }
-
-      }catch(e){}
-
-
-      /*
-       * localStorage가 없거나(샌드박스 등) 저장된 값이
-       * 없을 때: 이미 메모리에 시험 상태가 있으면
-       * 그대로 유지하고, 없을 때만 새로 만듭니다.
-       */
-      if(examState) return;
-
-      examState=
-        createExamState();
-
-      saveExamState();
-    }
-
-
-    function currentExamQuestion(){
-
-      return examBank[
-        examState.selected[
-          examState.current
-        ]
-      ];
-    }
-
-
-    function renderExam(){
-
-      if(!examState){
-        loadExamState();
-      }
-
-
-      const q=
-        currentExamQuestion();
-
-      const i=
-        examState.current;
-
-      const ans=
-        examState.answers[i];
-
-
-      document.getElementById(
-        "exam-qno"
-      ).textContent=
-        i+1;
-
-
-      document.getElementById(
-        "exam-question"
-      ).textContent=
-        q.q;
-
-
-      document.getElementById(
-        "exam-progress-bar"
-      ).style.width=
-        ((i+1)/20*100)+"%";
-
-
-      const box=
-        document.getElementById(
-          "exam-options"
-        );
-
-      box.innerHTML="";
-
-
-      q.o.forEach(
-        (label,n)=>{
-
-          const b=
-            document.createElement(
-              "button"
-            );
-
-          b.type="button";
-
-          b.className=
-            "exam-option";
-
-
-          /*
-           * 채점 전:
-           * 내가 선택한 보기 = 초록색
-           */
-          if(
-            !examState.graded &&
-            ans===n
-          ){
-            b.classList.add(
-              "selected"
-            );
-          }
-
-
-          /*
-           * 채점 후:
-           * 실제 정답 = 초록색
-           * 내가 고른 오답 = 빨간색
-           */
-          if(examState.graded){
-
-            if(n===q.a){
-              b.classList.add(
-                "correct"
-              );
-            }
-
-            if(
-              ans!==null &&
-              ans===n &&
-              n!==q.a
-            ){
-              b.classList.remove(
-                "selected"
-              );
-
-              b.classList.add(
-                "wrong"
-              );
-            }
-
-            b.disabled=true;
-          }
-
-
-          b.textContent=
-            String.fromCharCode(
-              65+n
-            )+
-            ". "+
-            label;
-
-
-          b.onclick=
-            ()=>answerExam(n);
-
-
-          box.appendChild(b);
-        }
-      );
-
-
-      const fb=
-        document.getElementById(
-          "exam-feedback"
-        );
-
-
-      if(examState.graded){
-
-        fb.style.display="block";
-
-
-        if(ans===null){
-
-          fb.innerHTML=
-            "<strong>미응답</strong><br>"+
-            "정답: "+
-            String.fromCharCode(
-              65+q.a
-            )+
-            ". "+
-            q.o[q.a]+
-            "<br>"+
-            q.e;
-
-        }else{
-
-          fb.innerHTML=
-            "<strong>"+
-            (
-              ans===q.a
-              ?"정답"
-              :"오답"
-            )+
-            "</strong><br>"+
-            "정답: "+
-            String.fromCharCode(
-              65+q.a
-            )+
-            ". "+
-            q.o[q.a]+
-            "<br>"+
-            q.e;
-        }
-
-      }else{
-
-        fb.style.display="none";
-      }
-
-
-      document.getElementById(
-        "exam-score"
-      ).textContent=
-        examState.graded
-        ?"점수 "+examState.correct+" / 20"
-        :"아직 미채점";
-
-
-      renderExamIndex();
-
-
-      const finish=
-        document.getElementById(
-          "exam-finish"
-        );
-
-
-      finish.style.display=
-        examState.graded
-        ?"block"
-        :"none";
-
-
-      if(examState.graded){
-
-        const answeredCount=
-          examState.answers.filter(
-            v=>v!==null
-          ).length;
-
-
-        const unansweredCount=
-          20-answeredCount;
-
-
-        let message=
-          "<strong>시험 완료!</strong><br>"+
-          "최종 점수: "+
-          examState.correct+
-          " / 20";
-
-
-        message+=
-          "<br><span class=\"text-sm\">"+
-          "응답 "+
-          answeredCount+
-          "문제 · 미응답 "+
-          unansweredCount+
-          "문제"+
-          "</span>";
-
-
-        finish.innerHTML=
-          message;
-      }
-    }
-
-
-    function answerExam(n){
-
-      /*
-       * 채점 후에는 답 변경 불가
-       */
-      if(examState.graded)return;
-
-
-      examState.answers[
-        examState.current
-      ]=n;
-
-
-      saveExamState();
-
-      renderExam();
-    }
-
-
-    function examPrev(){
-
-      if(examState.current>0){
-
-        examState.current--;
-
-        saveExamState();
-
-        renderExam();
-      }
-    }
-
-
-    function examNext(){
-
-      if(examState.current<19){
-
-        examState.current++;
-
-        saveExamState();
-
-        renderExam();
-      }
-    }
-
-
-    function goExamQuestion(i){
-
-      /*
-       * 채점 후에도 문제 번호를 눌러
-       * 자유롭게 다시 볼 수 있음
-       */
-      examState.current=
-        Math.max(
-          0,
-          Math.min(19,i)
-        );
-
-      saveExamState();
-
-      renderExam();
-    }
-
-
-    function renderExamIndex(){
-
-      const box=
-        document.getElementById(
-          "exam-index-grid"
-        );
-
-
-      box.innerHTML="";
-
-
-      examState.answers.forEach(
-        (ans,i)=>{
-
-          const b=
-            document.createElement(
-              "button"
-            );
-
-
-          b.type="button";
-
-
-          b.className=
-            "exam-index";
-
-
-          /*
-           * 현재 문제
-           */
-          if(
-            i===
-            examState.current
-          ){
-            b.classList.add(
-              "current"
-            );
-          }
-
-
-          /*
-           * 채점 전
-           */
-          if(!examState.graded){
-
-            if(ans===null){
-
-              b.classList.add(
-                "unanswered"
-              );
-
-            }else{
-
-              /*
-               * 답을 골랐다는 표시
-               */
-              b.classList.add(
-                "answered"
-              );
-            }
-
-          }
-
-
-          /*
-           * 채점 후
-           */
-          if(examState.graded){
-
-            if(ans===null){
-
-              /*
-               * 안 푼 문제 = 회색
-               */
-              b.classList.add(
-                "unanswered"
-              );
-
-            }else{
-
-              const correctAnswer=
-                examBank[
-                  examState.selected[i]
-                ].a;
-
-
-              if(
-                ans===correctAnswer
-              ){
-
-                /*
-                 * 맞은 문제 = 초록색
-                 */
-                b.classList.add(
-                  "correct"
-                );
-
-              }else{
-
-                /*
-                 * 틀린 문제 = 빨간색
-                 */
-                b.classList.add(
-                  "wrong"
-                );
-              }
-            }
-          }
-
-
-          b.textContent=
-            i+1;
-
-
-          /*
-           * 채점 후에도 이동 가능
-           */
-          b.onclick=
-            ()=>goExamQuestion(i);
-
-
-          box.appendChild(b);
-        }
-      );
-    }
-
-
-    function gradeExam(){
-
-      /*
-       * 이미 채점했다면 아무 것도 하지 않음
-       */
-      if(examState.graded)return;
-
-
-      /*
-       * 안 푼 문제는 null이므로
-       * 점수 계산에서 제외합니다.
-       *
-       * 예:
-       * 15문제 응답 + 5문제 미응답
-       * → 15문제만 맞고 틀린 것 계산
-       */
-      examState.correct=
-        examState.answers.reduce(
-          (sum,ans,i)=>{
-
-            if(ans===null){
-              return sum;
-            }
-
-
-            const correctAnswer=
-              examBank[
-                examState.selected[i]
-              ].a;
-
-
-            return sum+
-              (
-                ans===correctAnswer
-                ?1
-                :0
-              );
-
-          },
-          0
-        );
-
-
-      examState.graded=true;
-
-      saveExamState();
-
-      renderExam();
-
-      showToast(
-        "시험 채점이 완료되었습니다."
-      );
-    }
-
-
-    /*
-     * 문제 초기화
-     * ------------------------------------------------
-     * 기존에는 브라우저 기본 confirm()을 사용했는데,
-     * 이 페이지가 샌드박스(iframe) 환경에서 열릴 경우
-     * confirm()/alert() 호출이 차단되어 버튼이
-     * 아무 반응도 하지 않는 것처럼 보이는 문제가 있었습니다.
-     * 그래서 confirm() 대신 페이지 안에 직접 만든
-     * 확인 모달(#exam-reset-modal)을 사용하도록 바꿨습니다.
-     */
-    function resetExam(){
-
-      const modal=
-        document.getElementById(
-          "exam-reset-modal"
-        );
-
-      modal.classList.add("show");
-      modal.setAttribute("aria-hidden","false");
-    }
-
-
-    function cancelExamReset(){
-
-      const modal=
-        document.getElementById(
-          "exam-reset-modal"
-        );
-
-      modal.classList.remove("show");
-      modal.setAttribute("aria-hidden","true");
-    }
-
-
-    function confirmExamReset(){
-
-      cancelExamReset();
-
-
-      /*
-       * 기존 저장 시험 완전 삭제
-       */
-      try{
-
-        localStorage.removeItem(
-          EXAM_STORAGE_KEY
-        );
-
-      }catch(e){}
-
-
-      /*
-       * 새로운 시험 생성
-       */
-      examState=
-        createExamState();
-
-
-      saveExamState();
-
-
-      /*
-       * 첫 문제부터 표시
-       */
-      renderExam();
-
-
-      showToast(
-        "새로운 20문제가 출제되었습니다."
-      );
-    }
-
-
-    /* =========================
-       시작
-    ========================= */
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      ()=>{
-        lucide.createIcons();
-
-        loadState();
-
-        loadExamState();
-
-        renderExam();
-
-        setupRandomQuiz();
-
-        renderCharges(
-          "fur-particles",
-          "fur"
-        );
-
-        renderCharges(
-          "straw-particles",
-          "straw"
-        );
-
-        updateElectromagnetUI();
-
-
-        /*
-         * 모달 바깥(어두운 배경) 클릭 시 취소
-         */
-        document
-          .getElementById(
-            "exam-reset-modal"
-          )
-          .addEventListener(
-            "click",
-            e=>{
-              if(
-                e.target.id===
-                "exam-reset-modal"
-              ){
-                cancelExamReset();
-              }
-            }
-          );
-      }
+     )
     );
 
-  </script>
- </body>
+
+    options.appendChild(button);
+
+   }
+  );
+
+ }
+
+
+ function answerRandomQuiz(
+  choice,
+  button,
+  q,
+  options
+ ){
+
+  [
+   ...options.children
+  ].forEach(
+   item=>
+    item.disabled=true
+  );
+
+
+  const correct=
+   choice===q[2];
+
+
+  if(correct){
+
+   randomScore++;
+
+   button.classList.add(
+    "correct"
+   );
+
+  }else{
+
+   button.classList.add(
+    "wrong"
+   );
+
+   options.children[
+    q[2]
+   ].classList.add(
+    "correct"
+   );
+
+  }
+
+
+  const explanation=
+   document.createElement(
+    "div"
+   );
+
+
+  explanation.className=
+   "quiz-explanation";
+
+
+  explanation.innerHTML=
+   "<strong>"+
+   (
+    correct
+    ?"정답! 🎉"
+    :"오답! ❌"
+   )+
+   "</strong><br>"+
+   q[3];
+
+
+  const next=
+   document.createElement(
+    "button"
+   );
+
+
+  next.type="button";
+
+  next.className=
+   "quiz-next";
+
+  next.textContent=
+   randomIndex===2
+   ?"결과 보기"
+   :"다음 문제";
+
+
+  next.addEventListener(
+   "click",
+   ()=>{
+
+    randomIndex++;
+
+    randomIndex<3
+    ?renderRandomQuiz()
+    :finishRandomQuiz();
+
+   }
+  );
+
+
+  document
+   .getElementById(
+    "random-quiz-content"
+   )
+   .append(
+    explanation,
+    next
+   );
+
+
+  document.getElementById(
+   "quiz-score"
+  ).textContent=
+   "문제 "+
+   (randomIndex+1)+
+   " / 3 · 현재 점수 "+
+   randomScore;
+
+ }
+
+
+ function finishRandomQuiz(){
+
+  const box=
+   document.getElementById(
+    "random-quiz-content"
+   );
+
+
+  const message=
+   randomScore===3
+   ?"완벽해요! 🎉"
+   :randomScore===2
+   ?"좋아요! 조금만 더 복습해봐요 👍"
+   :"괜찮아요! 해설을 다시 확인해보세요 💪";
+
+
+  box.innerHTML=
+   "<div class=\"quiz-result\">"+
+   message+
+   "<br>최종 점수: "+
+   randomScore+
+   " / 3</div>";
+
+
+  document.getElementById(
+   "quiz-score"
+  ).textContent=
+   "완료 · "+
+   randomScore+
+   " / 3";
+
+ }
+
+
+ /* =========================
+    최종 시험
+ ========================= */
+
+ const EXAM_STORAGE_KEY=
+  "electroLabExamV2";
+
+ let examState=null;
+
+
+ const examBank=[
+
+  {
+   "q":"전구에 불이 켜지려면 회로는?",
+   "o":[
+    "끊어진 회로",
+    "닫힌 회로",
+    "전선이 하나뿐인 회로",
+    "전지가 없는 회로"
+   ],
+   "a":1,
+   "e":"전류가 흐르려면 닫힌 회로가 필요합니다."
+  },
+
+  {
+   "q":"스위치를 열면?",
+   "o":[
+    "회로가 연결된다",
+    "전류가 더 커진다",
+    "회로가 끊어진다",
+    "전지가 충전된다"
+   ],
+   "a":2,
+   "e":"스위치를 열면 전류 통로가 끊어집니다."
+  },
+
+  {
+   "q":"전지의 주된 역할은?",
+   "o":[
+    "빛을 직접 내는 것",
+    "전기 에너지를 공급하는 것",
+    "전류를 측정하는 것",
+    "전선을 절연하는 것"
+   ],
+   "a":1,
+   "e":"전지는 회로에 전기 에너지를 공급합니다."
+  },
+
+  {
+   "q":"전선의 주된 역할은?",
+   "o":[
+    "전류가 흐르는 통로를 제공한다",
+    "전압을 항상 0으로 만든다",
+    "전지를 대신한다",
+    "전구 밝기를 자동 조절한다"
+   ],
+   "a":0,
+   "e":"전선은 전류가 흐를 통로를 제공합니다."
+  },
+
+  {
+   "q":"직렬 회로에서 전구 하나가 끊어지면 다른 전구는?",
+   "o":[
+    "더 밝아진다",
+    "계속 켜진다",
+    "꺼진다",
+    "전압이 두 배가 된다"
+   ],
+   "a":2,
+   "e":"직렬 회로는 한 곳이 끊어지면 전체가 끊어집니다."
+  },
+
+  {
+   "q":"전구를 직렬로 하나 더 연결하면 각 전구의 전압은 일반적으로?",
+   "o":[
+    "더 커진다",
+    "나뉘어 작아진다",
+    "항상 0이 된다",
+    "반드시 두 배가 된다"
+   ],
+   "a":1,
+   "e":"직렬 연결에서는 전압이 여러 소자에 나뉘어 걸립니다."
+  },
+
+  {
+   "q":"병렬로 연결한 전구 하나를 빼도 다른 전구가 켜질 수 있는 이유는?",
+   "o":[
+    "전류가 여러 경로로 흐를 수 있어서",
+    "전지가 두 개로 늘어나서",
+    "전선이 없어져서",
+    "전구의 저항이 0이어서"
+   ],
+   "a":0,
+   "e":"병렬 회로에는 여러 전류 경로가 있습니다."
+  },
+
+  {
+   "q":"전지와 전구만 있고 전선이 없다면 가장 큰 문제는?",
+   "o":[
+    "전압이 너무 크다",
+    "전류 통로가 연결되지 않는다",
+    "전구가 자동으로 꺼진다",
+    "전지가 자석이 된다"
+   ],
+   "a":1,
+   "e":"전선이 없으면 연결된 전류 통로를 만들기 어렵습니다."
+  },
+
+  {
+   "q":"전류가 흐를 수 있는 완전한 통로는?",
+   "o":[
+    "닫힌 회로",
+    "열린 회로",
+    "절연체",
+    "전류계"
+   ],
+   "a":0,
+   "e":"닫힌 회로는 전류가 흐를 수 있는 연결된 통로입니다."
+  },
+
+  {
+   "q":"회로를 연결하거나 끊는 기구는?",
+   "o":[
+    "전구",
+    "스위치",
+    "전지",
+    "저항"
+   ],
+   "a":1,
+   "e":"스위치는 회로를 연결하거나 끊습니다."
+  }
+
+ ];
+
+
+ /*
+  * 현재 데이터는 기존 구조를 그대로 유지합니다.
+  */
+ while(examBank.length<100){
+
+  const base=
+   examBank[
+    (examBank.length-1)%10
+   ];
+
+  examBank.push({
+   ...base
+  });
+
+ }
+
+
+ function createExamState(){
+
+  const indices=
+   examBank.map(
+    (_,i)=>i
+   );
+
+
+  for(
+   let i=indices.length-1;
+   i>0;
+   i--
+  ){
+
+   const j=
+    Math.floor(
+     Math.random()*
+     (i+1)
+    );
+
+
+   [
+    indices[i],
+    indices[j]
+   ]=[
+    indices[j],
+    indices[i]
+   ];
+
+  }
+
+
+  return{
+
+   selected:
+    indices.slice(0,20),
+
+   answers:
+    Array(20).fill(null),
+
+   current:0,
+
+   correct:0,
+
+   graded:false
+
+  };
+
+ }
+
+
+ function saveExamState(){
+
+  try{
+
+   localStorage.setItem(
+    EXAM_STORAGE_KEY,
+    JSON.stringify(
+     examState
+    )
+   );
+
+  }catch(e){}
+
+ }
+
+
+ function loadExamState(){
+
+  try{
+
+   const raw=
+    localStorage.getItem(
+     EXAM_STORAGE_KEY
+    );
+
+
+   if(raw){
+
+    const saved=
+     JSON.parse(raw);
+
+
+    if(
+     saved &&
+     Array.isArray(
+      saved.selected
+     ) &&
+     saved.selected.length===20 &&
+     Array.isArray(
+      saved.answers
+     ) &&
+     saved.answers.length===20
+    ){
+
+     examState={
+      ...saved,
+
+      current:
+       Number.isInteger(
+        saved.current
+       )
+       ?Math.max(
+        0,
+        Math.min(
+         19,
+         saved.current
+        )
+       )
+       :0,
+
+      correct:
+       Number.isInteger(
+        saved.correct
+       )
+       ?saved.correct
+       :0,
+
+      graded:
+       Boolean(
+        saved.graded
+       )
+     };
+
+     return;
+
+    }
+
+   }
+
+  }catch(e){}
+
+
+  if(examState)return;
+
+
+  examState=
+   createExamState();
+
+  saveExamState();
+
+ }
+
+
+ function currentExamQuestion(){
+
+  return examBank[
+   examState.selected[
+    examState.current
+   ]
+  ];
+
+ }
+
+
+ function renderExam(){
+
+  if(!examState){
+   loadExamState();
+  }
+
+
+  const q=
+   currentExamQuestion();
+
+  const i=
+   examState.current;
+
+  const ans=
+   examState.answers[i];
+
+
+  document.getElementById(
+   "exam-qno"
+  ).textContent=
+   i+1;
+
+
+  document.getElementById(
+   "exam-question"
+  ).textContent=
+   q.q;
+
+
+  document.getElementById(
+   "exam-progress-bar"
+  ).style.width=
+   ((i+1)/20*100)+"%";
+
+
+  const box=
+   document.getElementById(
+    "exam-options"
+   );
+
+  box.innerHTML="";
+
+
+  q.o.forEach(
+   (label,n)=>{
+
+    const b=
+     document.createElement(
+      "button"
+     );
+
+    b.type="button";
+
+    b.className=
+     "exam-option";
+
+
+    if(
+     !examState.graded &&
+     ans===n
+    ){
+
+     b.classList.add(
+      "selected"
+     );
+
+    }
+
+
+    if(examState.graded){
+
+     if(n===q.a){
+
+      b.classList.add(
+       "correct"
+      );
+
+     }
+
+
+     if(
+      ans!==null &&
+      ans===n &&
+      n!==q.a
+     ){
+
+      b.classList.remove(
+       "selected"
+      );
+
+      b.classList.add(
+       "wrong"
+      );
+
+     }
+
+     b.disabled=true;
+
+    }
+
+
+    b.textContent=
+     String.fromCharCode(
+      65+n
+     )+
+     ". "+
+     label;
+
+
+    b.onclick=
+     ()=>answerExam(n);
+
+
+    box.appendChild(b);
+
+   }
+  );
+
+
+  const fb=
+   document.getElementById(
+    "exam-feedback"
+   );
+
+
+  if(examState.graded){
+
+   fb.style.display="block";
+
+
+   if(ans===null){
+
+    fb.innerHTML=
+     "<strong>미응답</strong><br>"+
+     "정답: "+
+     String.fromCharCode(
+      65+q.a
+     )+
+     ". "+
+     q.o[q.a]+
+     "<br>"+
+     q.e;
+
+   }else{
+
+    fb.innerHTML=
+     "<strong>"+
+     (
+      ans===q.a
+      ?"정답"
+      :"오답"
+     )+
+     "</strong><br>"+
+     "정답: "+
+     String.fromCharCode(
+      65+q.a
+     )+
+     ". "+
+     q.o[q.a]+
+     "<br>"+
+     q.e;
+
+   }
+
+  }else{
+
+   fb.style.display="none";
+
+  }
+
+
+  document.getElementById(
+   "exam-score"
+  ).textContent=
+   examState.graded
+   ?"점수 "+examState.correct+" / 20"
+   :"아직 미채점";
+
+
+  renderExamIndex();
+
+
+  const finish=
+   document.getElementById(
+    "exam-finish"
+   );
+
+
+  finish.style.display=
+   examState.graded
+   ?"block"
+   :"none";
+
+
+  if(examState.graded){
+
+   const answeredCount=
+    examState.answers.filter(
+     v=>v!==null
+    ).length;
+
+
+   const unansweredCount=
+    20-answeredCount;
+
+
+   let message=
+    "<strong>시험 완료!</strong><br>"+
+    "최종 점수: "+
+    examState.correct+
+    " / 20";
+
+
+   message+=
+    "<br><span class=\"text-sm\">"+
+    "응답 "+
+    answeredCount+
+    "문제 · 미응답 "+
+    unansweredCount+
+    "문제"+
+    "</span>";
+
+
+   finish.innerHTML=
+    message;
+
+  }
+
+ }
+
+
+ function answerExam(n){
+
+  if(examState.graded)return;
+
+
+  examState.answers[
+   examState.current
+  ]=n;
+
+
+  saveExamState();
+
+  renderExam();
+
+ }
+
+
+ function examPrev(){
+
+  if(examState.current>0){
+
+   examState.current--;
+
+   saveExamState();
+
+   renderExam();
+
+  }
+
+ }
+
+
+ function examNext(){
+
+  if(examState.current<19){
+
+   examState.current++;
+
+   saveExamState();
+
+   renderExam();
+
+  }
+
+ }
+
+
+ function goExamQuestion(i){
+
+  examState.current=
+   Math.max(
+    0,
+    Math.min(19,i)
+   );
+
+
+  saveExamState();
+
+  renderExam();
+
+ }
+
+
+ function renderExamIndex(){
+
+  const box=
+   document.getElementById(
+    "exam-index-grid"
+   );
+
+
+  box.innerHTML="";
+
+
+  examState.answers.forEach(
+   (ans,i)=>{
+
+    const b=
+     document.createElement(
+      "button"
+     );
+
+
+    b.type="button";
+
+    b.className=
+     "exam-index";
+
+
+    if(
+     i===
+     examState.current
+    ){
+
+     b.classList.add(
+      "current"
+     );
+
+    }
+
+
+    if(!examState.graded){
+
+     if(ans===null){
+
+      b.classList.add(
+       "unanswered"
+      );
+
+     }else{
+
+      b.classList.add(
+       "answered"
+      );
+
+     }
+
+    }
+
+
+    if(examState.graded){
+
+     if(ans===null){
+
+      b.classList.add(
+       "unanswered"
+      );
+
+     }else{
+
+      const correctAnswer=
+       examBank[
+        examState.selected[i]
+       ].a;
+
+
+      if(
+       ans===correctAnswer
+      ){
+
+       b.classList.add(
+        "correct"
+       );
+
+      }else{
+
+       b.classList.add(
+        "wrong"
+       );
+
+      }
+
+     }
+
+    }
+
+
+    b.textContent=
+     i+1;
+
+
+    b.onclick=
+     ()=>goExamQuestion(i);
+
+
+    box.appendChild(b);
+
+   }
+  );
+
+ }
+
+
+ function gradeExam(){
+
+  if(examState.graded)return;
+
+
+  examState.correct=
+   examState.answers.reduce(
+    (sum,ans,i)=>{
+
+     if(ans===null){
+      return sum;
+     }
+
+
+     const correctAnswer=
+      examBank[
+       examState.selected[i]
+      ].a;
+
+
+     return sum+
+      (
+       ans===correctAnswer
+       ?1
+       :0
+      );
+
+    },
+    0
+   );
+
+
+  examState.graded=true;
+
+  saveExamState();
+
+  renderExam();
+
+  showToast(
+   "시험 채점이 완료되었습니다."
+  );
+
+ }
+
+
+ function resetExam(){
+
+  const modal=
+   document.getElementById(
+    "exam-reset-modal"
+   );
+
+
+  modal.classList.add("show");
+
+  modal.setAttribute(
+   "aria-hidden",
+   "false"
+  );
+
+ }
+
+
+ function cancelExamReset(){
+
+  const modal=
+   document.getElementById(
+    "exam-reset-modal"
+   );
+
+
+  modal.classList.remove("show");
+
+  modal.setAttribute(
+   "aria-hidden",
+   "true"
+  );
+
+ }
+
+
+ function confirmExamReset(){
+
+  cancelExamReset();
+
+
+  try{
+
+   localStorage.removeItem(
+    EXAM_STORAGE_KEY
+   );
+
+  }catch(e){}
+
+
+  examState=
+   createExamState();
+
+
+  saveExamState();
+
+  renderExam();
+
+
+  showToast(
+   "새로운 20문제가 출제되었습니다."
+  );
+
+ }
+
+
+ /* =========================
+    시작
+ ========================= */
+
+ document.addEventListener(
+  "DOMContentLoaded",
+  ()=>{
+
+   lucide.createIcons();
+
+   loadState();
+
+   loadExamState();
+
+   renderExam();
+
+   setupRandomQuiz();
+
+
+   renderCharges(
+    "fur-particles",
+    "fur"
+   );
+
+
+   renderCharges(
+    "straw-particles",
+    "straw"
+   );
+
+
+   /*
+    * 나침반 최초 1회 생성
+    */
+   createCompasses();
+
+
+   /*
+    * 최초 상태 OFF
+    */
+   updateElectromagnetUI();
+
+
+   /*
+    * 시험 초기화 모달 바깥 클릭
+    */
+   document
+    .getElementById(
+     "exam-reset-modal"
+    )
+    .addEventListener(
+     "click",
+     e=>{
+
+      if(
+       e.target.id===
+       "exam-reset-modal"
+      ){
+
+       cancelExamReset();
+
+      }
+
+     }
+    );
+
+  }
+ );
+
+</script>
+
+</body>
 </html>
