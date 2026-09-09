@@ -1,17 +1,16 @@
 <!doctype html>
 <html lang="ko">
- <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260908-05-b9d8a99","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/9e99ecf74af2a081.telemetry_sdk.js"></script>
+ <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ELECTRO LAB | 전기와 자기</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
-  <script src="/_sdk/fbe2ebfd64647c54.data_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
   <style>
     :root { --ink:#07112b; --cyan:#60dfff; --yellow:#f8ef56; --line:rgba(115,190,255,.24); }
     * { box-sizing:border-box; }
-    body { margin:0; color:#eaf7ff; font-family:"DM Sans",sans-serif; overflow-x:hidden; }
+    body { margin:0; color:#eaf7ff; font-family:"DM Sans",sans-serif; overflow-x:hidden; background:#07112b; }
     .app-shell { width:100%; min-height:100vh; background:#07112b; }
     .lab-grid { background-image:linear-gradient(rgba(97,212,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(97,212,255,.055) 1px,transparent 1px); background-size:34px 34px; }
     .orb { position:fixed; border-radius:999px; filter:blur(80px); opacity:.28; pointer-events:none; }
@@ -92,11 +91,20 @@
     .exam-result{margin-top:14px;padding:18px;border:1px solid rgba(116,247,191,.25);background:rgba(116,247,191,.07);border-radius:14px}
     @media(max-width:900px){.exam-grid{grid-template-columns:1fr}}
     @media(max-width:600px){.random-options{grid-template-columns:1fr!important}}
+
+    /* 토스트 */
+    .toast{opacity:0;visibility:hidden;transform:translate(-50%,10px);transition:opacity .25s ease,transform .25s ease;}
+    .toast.show{opacity:1;visibility:visible;transform:translate(-50%,0);}
+
+    /* 시험 초기화 확인 모달 (confirm() 대체) */
+    .exam-reset-overlay{position:fixed;inset:0;z-index:70;background:rgba(3,9,26,.68);display:none;align-items:center;justify-content:center;padding:20px;}
+    .exam-reset-overlay.show{display:flex;}
+    .exam-reset-box{background:linear-gradient(145deg,rgba(21,42,91,.98),rgba(8,20,53,.99));border:1px solid var(--line);border-radius:18px;padding:24px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.45);animation:reveal .25s ease both;}
+    .exam-reset-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
   </style>
-  <script src="/_sdk/fcb6dc01f91829ac.resizing_sdk.js"></script>
  </head>
 
- <body data-template-id="__page-root">
+ <body>
   <div class="app-shell lab-grid">
    <div class="orb orb-a"></div>
    <div class="orb orb-b"></div>
@@ -539,11 +547,21 @@
 
   <div id="toast" class="toast fixed z-50 bottom-5 left-1/2 -translate-x-1/2 rounded-2xl border border-yellow-200/50 bg-[#132752] px-5 py-3 text-center font-bold text-yellow-100 shadow-2xl" aria-live="polite"></div>
 
-  <script src="/_sdk/20ec72cea0cb85e1.editing_sdk.js"></script>
+  <!-- 시험 초기화 확인 모달: 브라우저 confirm() 대신 사용 (샌드박스 환경에서 confirm이 막히는 문제 해결) -->
+  <div id="exam-reset-modal" class="exam-reset-overlay" aria-hidden="true">
+   <div class="exam-reset-box" role="dialog" aria-modal="true" aria-labelledby="exam-reset-title">
+    <p id="exam-reset-title" class="font-bold text-lg">시험 초기화</p>
+    <p class="text-sm text-sky-100/70 mt-2">현재 시험을 초기화하고 새로운 20문제를 뽑을까요?</p>
+    <div class="exam-reset-actions">
+     <button type="button" class="exam-btn" onclick="cancelExamReset()">취소</button>
+     <button type="button" class="exam-btn primary" onclick="confirmExamReset()">초기화</button>
+    </div>
+   </div>
+  </div>
 
   <script>
     /* =========================
-       기본 학습 데이터
+       기본 학습 데이터 (로컬 저장, 서버 SDK 없이 동작)
     ========================= */
 
     const defaultState = {
@@ -558,9 +576,9 @@
       last_activity:""
     };
 
+    const STATE_STORAGE_KEY="electroLabStateV1";
+
     let state={...defaultState};
-    let record=null;
-    let dataReady=false;
     const rewards=new Set();
 
 
@@ -582,13 +600,34 @@
     }
 
 
-    async function saveChanges(changes){
+    function saveState(){
+      try{
+        localStorage.setItem(
+          STATE_STORAGE_KEY,
+          JSON.stringify(state)
+        );
+      }catch(e){}
+    }
+
+
+    function loadState(){
+      try{
+        const raw=localStorage.getItem(STATE_STORAGE_KEY);
+        if(raw){
+          state={...defaultState,...JSON.parse(raw)};
+        }
+      }catch(e){}
+      renderStats();
+    }
+
+
+    function saveChanges(changes){
       const total=
         changes.total_exp!==undefined
         ? changes.total_exp
         : state.total_exp;
 
-      const next={
+      state={
         ...state,
         ...changes,
         total_exp:total,
@@ -599,21 +638,8 @@
         last_activity:new Date().toISOString()
       };
 
-      state=next;
       renderStats();
-
-      if(!dataReady)return;
-
-      try{
-        const result=
-          record
-          ? await window.dataSdk.update({...record,...next})
-          : await window.dataSdk.create(next);
-
-        if(!result.isOk){
-          showToast("학습 기록을 저장하지 못했어요.");
-        }
-      }catch(e){}
+      saveState();
     }
 
 
@@ -630,34 +656,6 @@
       showToast(
         "+"+amount+" EXP · "+message
       );
-    }
-
-
-    const handler={
-      onDataChanged(data){
-        record=data[0]||null;
-
-        if(record){
-          state={
-            ...defaultState,
-            ...record
-          };
-        }
-
-        renderStats();
-      }
-    };
-
-
-    async function initData(){
-      try{
-        const result=
-          await window.dataSdk.init(handler);
-
-        dataReady=result.isOk;
-      }catch(e){
-        dataReady=false;
-      }
     }
 
 
@@ -2749,6 +2747,13 @@
       }catch(e){}
 
 
+      /*
+       * localStorage가 없거나(샌드박스 등) 저장된 값이
+       * 없을 때: 이미 메모리에 시험 상태가 있으면
+       * 그대로 유지하고, 없을 때만 새로 만듭니다.
+       */
+      if(examState) return;
+
       examState=
         createExamState();
 
@@ -3238,15 +3243,43 @@
     }
 
 
+    /*
+     * 문제 초기화
+     * ------------------------------------------------
+     * 기존에는 브라우저 기본 confirm()을 사용했는데,
+     * 이 페이지가 샌드박스(iframe) 환경에서 열릴 경우
+     * confirm()/alert() 호출이 차단되어 버튼이
+     * 아무 반응도 하지 않는 것처럼 보이는 문제가 있었습니다.
+     * 그래서 confirm() 대신 페이지 안에 직접 만든
+     * 확인 모달(#exam-reset-modal)을 사용하도록 바꿨습니다.
+     */
     function resetExam(){
 
-      const ok=
-        confirm(
-          "현재 시험을 초기화하고 새로운 20문제를 뽑을까요?"
+      const modal=
+        document.getElementById(
+          "exam-reset-modal"
         );
 
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden","false");
+    }
 
-      if(!ok)return;
+
+    function cancelExamReset(){
+
+      const modal=
+        document.getElementById(
+          "exam-reset-modal"
+        );
+
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden","true");
+    }
+
+
+    function confirmExamReset(){
+
+      cancelExamReset();
 
 
       /*
@@ -3292,15 +3325,13 @@
       ()=>{
         lucide.createIcons();
 
-        renderStats();
+        loadState();
 
         loadExamState();
 
         renderExam();
 
         setupRandomQuiz();
-
-        initData();
 
         renderCharges(
           "fur-particles",
@@ -3313,6 +3344,26 @@
         );
 
         updateElectromagnetUI();
+
+
+        /*
+         * 모달 바깥(어두운 배경) 클릭 시 취소
+         */
+        document
+          .getElementById(
+            "exam-reset-modal"
+          )
+          .addEventListener(
+            "click",
+            e=>{
+              if(
+                e.target.id===
+                "exam-reset-modal"
+              ){
+                cancelExamReset();
+              }
+            }
+          );
       }
     );
 
